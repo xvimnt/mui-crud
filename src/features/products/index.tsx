@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Table from "../../components/Table";
 import FormDialog from "../../components/FormDialog";
 
@@ -11,64 +12,83 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 // API
-import { getAllProducts, addProduct, deleteProduct, updateProduct  } from "./api";
-import { useEffect } from "react";
+import { getAllProducts, addProduct, deleteProduct, updateProduct } from "./api";
 import { selectProducts } from "./slice";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { Product } from "./schema";
+import ConfirmDialog from "../../components/ConfimDialog";
 
-const columns: GridColDef[] = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'detail', headerName: 'Detalle', width: 430 },
-  { field: 'name', headerName: 'Nombre', width: 430 },
-  { field: 'price', headerName: 'Precio', width: 430 },
-  {
-    field: "action",
-    headerName: "Action",
-    width: 130,
-    sortable: false,
-    renderCell: (params) => {
-      const onClick = (e: any) => {
-        e.stopPropagation(); // don't select this row after clicking
-
-        const api: GridApi = params.api;
-        const thisRow: Record<string, any> = {};
-
-        api
-          .getAllColumns()
-          .filter((c) => c.field !== "__check__" && !!c)
-          .forEach(
-            (c) => (thisRow[c.field] = params.row[c.field])
-          );
-
-        return alert(JSON.stringify(thisRow, null, 4));
-      };
-
-      return (
-        <ButtonGroup variant="contained" aria-label="outlined primary button group">
-          <Button size="small" onClick={onClick}><EditIcon></EditIcon></Button>
-          <Button size="small" onClick={onClick}><DeleteIcon></DeleteIcon></Button>
-        </ButtonGroup>
-      );
-    }
-  },
-];
 
 export default function Products() {
 
   const products = useAppSelector(selectProducts);
   const dispatch = useAppDispatch();
-  
+
   useEffect(() => {
     dispatch(getAllProducts())
   }, [dispatch])
-  
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'name', headerName: 'Nombre', width: 430 },
+    { field: 'detail', headerName: 'Detalle', width: 630 },
+    { field: 'price', headerName: 'Precio', width: 330, type: 'number' },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 130,
+      sortable: false,
+      renderCell: (params) => {
+        const onClick = (e: any, submitFunction: Function) => {
+          e.stopPropagation(); // don't select this row after clicking
+          // Open confirmation dialog to delete
+          setConfirmOpen(true)
+
+          const product: Product = params.row
+
+          console.log(product)
+          
+          // return submitFunction(product)
+        };
+
+        return (
+          <ButtonGroup variant="contained" aria-label="outlined primary button group">
+            <Button size="small" onClick={(e) => onClick(e, updateProduct)}><EditIcon></EditIcon></Button>
+            <Button size="small" onClick={(e) => onClick(e, deleteProduct)}><DeleteIcon></DeleteIcon></Button>
+          </ButtonGroup>
+        );
+      }
+    },
+  ];
+
   return (
     <>
       <Box sx={{ width: '100%', height: '100%' }}>
         <Typography variant="h3" gutterBottom>
           Productos
         </Typography>
-        <FormDialog title="Agregar Nuevo Producto" button_title={"Agregar nuevo"}>
+        <ConfirmDialog
+          title="Delete Post?"
+          open={confirmOpen}
+          setOpen={setConfirmOpen}
+          onConfirm={deleteProduct}
+        >
+          Estas seguro de querer eliminar este producto?
+        </ConfirmDialog>
+        <Button variant="outlined" onClick={() => setConfirmOpen(true)}>Borrar Seleccionados</Button>
+        <FormDialog title="Agregar Nuevo Producto" button_title={"Agregar nuevo"} text="Asegurese de que el codigo sea diferente a alguno ya existente">
+          <TextField
+            autoFocus
+            margin="dense"
+            id="id"
+            label="Codigo"
+            type="number"
+            fullWidth
+            variant="standard"
+          />
           <TextField
             autoFocus
             margin="dense"
@@ -99,9 +119,8 @@ export default function Products() {
             variant="standard"
           />
         </FormDialog>
-        <Button variant="outlined">Borrar Seleccionados</Button>
         {products.fetchStatus === "error" && <Alert severity="error">Ocurrio un error al obtener los datos!</Alert>}
-        {products.fetchStatus === "loading" && <Box sx={{ display: 'flex' }}><LinearProgress /></Box>}
+        {products.fetchStatus === "loading" && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
         {products.fetchStatus === "success" && <Table rows={products.data} columns={columns}></Table>}
       </Box>
     </>
