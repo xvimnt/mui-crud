@@ -54,7 +54,7 @@ export default function LeftBar(props: any) {
                     <Typography variant="h6" noWrap component="a" href="/"
                         sx={{
                             mr: 2,
-                            display: { xs: 'none', md: 'flex' },
+                            display: { xs: 'flex', md: 'flex' },
                             fontFamily: 'monospace',
                             fontWeight: 700,
                             letterSpacing: '.3rem',

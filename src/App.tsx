@@ -8,7 +8,7 @@ function App() {
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <LeftBar></LeftBar>
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 6 }}>
           <Grid container>
             <Products></Products>
           </Grid>
