@@ -14,7 +14,6 @@ export default function Table(props: PropsType) {
         columns={columns}
         pageSize={6}
         rowsPerPageOptions={[6]}
-        checkboxSelection
       />
     </div>
   );

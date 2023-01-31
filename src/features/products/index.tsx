@@ -13,12 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
 // API
-import {
-  getAllProducts as getAllItems,
-  addProduct,
-  deleteProduct as deleteItem,
-  updateProduct as updateItem
-} from "./api";
+import { getAllProducts, addProduct, deleteProduct, updateProduct } from "./api";
 import { selectProducts } from "./slice";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Product } from "./schema";
@@ -31,7 +26,7 @@ export default function Products() {
   const rows = useAppSelector(selectProducts);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(getAllItems())
+    dispatch(getAllProducts())
   }, [dispatch])
 
 
@@ -47,22 +42,20 @@ export default function Products() {
       width: 130,
       sortable: false,
       renderCell: (params) => {
+
         const onClick = (e: any, submitFunction: Function) => {
           e.stopPropagation(); // don't select this row after clicking
-          // Open confirmation dialog to delete
-          setConfirmOpen(true)
-
+          // Select the item from the row
           const product: Product = params.row
-
-          console.log(product)
-
-          // return submitFunction(product)
+          setItem(product)
+          // Do any action
+          submitFunction()
         };
 
         return (
           <ButtonGroup variant="contained" aria-label="outlined primary button group">
-            <Button size="small" onClick={(e) => onClick(e, updateItem)}><EditIcon></EditIcon></Button>
-            <Button size="small" onClick={(e) => onClick(e, deleteItem)}><DeleteIcon></DeleteIcon></Button>
+            <Button size="small" onClick={(e) => onClick(e, () => setConfirmOpen(true))}><EditIcon></EditIcon></Button>
+            <Button size="small" onClick={(e) => onClick(e, () => setConfirmOpen(true))}><DeleteIcon></DeleteIcon></Button>
           </ButtonGroup>
         );
       }
@@ -83,13 +76,14 @@ export default function Products() {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Item
-  const item: Product = {
+  const defaultItem: Product = {
     id: id,
     name: name,
     detail: detail,
     imageUrl: "https://images.unsplash.com/photo-1545289414-1c3cb1c06238?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
     price: price,
   }
+  const [item, setItem] = useState<Product>(defaultItem)
 
   // Fields
   const fields = <>
@@ -102,7 +96,7 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={id}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setId(Number(event.target.value)) }
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setId(Number(event.target.value))}
     />
     <TextField
       autoFocus
@@ -113,7 +107,7 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={name}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value) }
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)}
     />
     <TextField
       autoFocus
@@ -126,7 +120,7 @@ export default function Products() {
       multiline
       maxRows={4}
       value={detail}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDetail(event.target.value) }
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDetail(event.target.value)}
     />
     <TextField
       autoFocus
@@ -137,19 +131,25 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={price}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPrice(Number(event.target.value)) }
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPrice(Number(event.target.value))}
     />
   </>
 
   // Functions 
   const addItem = async () => {
-    await dispatch(addProduct(item))
-    
+    await dispatch(addProduct(defaultItem))
+
     setId(0)
     setName('')
     setDetail('')
     setPrice(0)
-  } 
+  }
+
+  const deleteItem = async () => {
+    await dispatch(deleteProduct(item))
+    setConfirmOpen(false)
+    setItem(defaultItem)
+  }
 
   return (
     <>
