@@ -30,7 +30,6 @@ export const getAllProducts = createAsyncThunk("get-all-products", async () => {
 })
  
 export const addProduct = createAsyncThunk("add-product", async (item: Product) => {
-
     const response = await axios({
         url: "/products",
         baseURL: env.API_URL,

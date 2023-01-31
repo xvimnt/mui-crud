@@ -7,14 +7,15 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 interface PropsType {
-    title: String,
-    button_title: String,
+    title: any,
+    button_title: any,
     text: String,
     children: any,
+    subscribe: any,
 }
 
 export default function FormDialog(props: PropsType) {
-    const {title, button_title, text, children} = props
+    const {title, button_title, text, children, subscribe} = props
     const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = () => {
@@ -39,8 +40,8 @@ export default function FormDialog(props: PropsType) {
                     {children}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleClose}>Subscribe</Button>
+                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button onClick={subscribe}>Guardar</Button>
                 </DialogActions>
             </Dialog>
         </div>

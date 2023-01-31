@@ -1,4 +1,7 @@
 import * as React from 'react';
+import TopBar from './TopBar';
+
+// MUI
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -12,7 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import TopBar from './TopBar';
+import MonitorIcon from '@mui/icons-material/Monitor';
 
 const drawerWidth = 240;
 
@@ -63,6 +66,10 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
+const features = [{
+    label:'Productos', icon: <MonitorIcon />
+}]
+
 export default function LeftBar() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
@@ -111,8 +118,8 @@ export default function LeftBar() {
                 </List>
                 <Divider />
                 <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                    {features.map((obj, index) => (
+                        <ListItem key={obj.label} disablePadding sx={{ display: 'block' }}>
                             <ListItemButton
                                 sx={{
                                     minHeight: 48,
@@ -127,9 +134,9 @@ export default function LeftBar() {
                                         justifyContent: 'center',
                                     }}
                                 >
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                    {obj.icon}
                                 </ListItemIcon>
-                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                                <ListItemText primary={obj.label} sx={{ opacity: open ? 1 : 0 }} />
                             </ListItemButton>
                         </ListItem>
                     ))}
