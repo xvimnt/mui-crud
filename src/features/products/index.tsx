@@ -9,7 +9,7 @@ import ConfirmDialog from "../../components/ConfimDialog";
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { GridColDef } from '@mui/x-data-grid';
+import { GridColDef, GridColumnVisibilityModel } from '@mui/x-data-grid';
 import { Alert, Button, ButtonGroup, LinearProgress } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -118,7 +118,20 @@ export default function Products() {
       value={item.price}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, price: Number(event.target.value) })}
     />
-    {item.imageUrl && <center>
+    <TextField
+      autoFocus
+      required
+      error={emptyField && item.stock === defaultItem.stock}
+      margin="dense"
+      id="stock"
+      label="Disponibles"
+      type="number"
+      fullWidth
+      variant="standard"
+      value={item.stock}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, stock: Number(event.target.value) })}
+    />
+    {item.imageUrl && !preview && <center>
       <Box
         component="img"
         sx={{
@@ -137,6 +150,7 @@ export default function Products() {
     </center>
   </form>
 
+
 // Functions 
 const resetStates = () => {
   setItem(defaultItem)
@@ -148,7 +162,7 @@ const resetStates = () => {
 
 const addItem = async () => {
   // Verifying empty fields
-  if (item.id && item.name && item.detail && item.price) {
+  if (item.id && item.name && item.detail && item.price && item.stock) {
     // Verifying if code exists in table
     const index = rows.data.findIndex((e) => e.id === item.id);
     if (index === -1) {
@@ -166,7 +180,6 @@ const addItem = async () => {
     } else {
       setEmptyField(true)
     }
-    resetStates()
   }
   
   const closeAdd = () => {
@@ -176,13 +189,25 @@ const addItem = async () => {
   
   const editItem = async () => {
     // Verifying empty fields
-    if (item.id && item.name && item.detail && item.price) {
-      await dispatch(updateProduct(item))
-      setEditOpen(false)
+    if (item.id && item.name && item.detail && item.price && item.stock) {
+      // Set the url from the img in S3
+      const handleUrl = (url: string) => {
+        if(item.imageUrl !== url)  {
+          // Delete the previous url
+          // Set the new Image
+          item.imageUrl = url
+        } 
+        
+        dispatch(updateProduct(item))
+        resetStates()
+        setEditOpen(false)
+      }
+      // Upload the image to S3 and then the item to DynamoDB
+      uploadFileToS3(file, "vsms-products", handleUrl)
+      
     } else {
       setEmptyField(true)
     }
-    setItem(defaultItem)
   }
   
   const closeEdit = () => {
@@ -193,20 +218,15 @@ const addItem = async () => {
   const deleteItem = async () => {
     await dispatch(deleteProduct(item))
     setConfirmDeleteOpen(false)
-    setItem(defaultItem)
+    resetStates()
   }
   
   // Columns definition
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'name', headerName: 'Nombre', width: 430 },
-    { field: 'detail', headerName: 'Detalle', width: 630 },
-    { field: 'price', headerName: 'Precio', width: 330, type: 'number' },
-    { field: 'imageUrl', headerName: 'Image Url', width: 330},
     {
       field: "action",
       headerName: "Action",
-      width: 130,
+      flex: 5,
       sortable: false,
       renderCell: (params) => {
         const onClick = (e: any, submitFunction: Function) => {
@@ -226,7 +246,18 @@ const addItem = async () => {
         );
       }
     },
+    { field: 'id', headerName: 'ID', flex: 2, type: 'number' },
+    { field: 'name', headerName: 'Nombre', flex: 10 },
+    { field: 'detail', headerName: 'Detalle', flex: 10 },
+    { field: 'price', headerName: 'Precio', flex: 5, type: 'number' },
+    { field: 'imageUrl', headerName: 'Image Url', flex: 10},
+    { field: 'stock', headerName: 'Disponibles', flex: 5, type: 'number'},
+    
   ];
+  // Hide columns
+  const columnVisibilityModel: GridColumnVisibilityModel = {
+    imageUrl: false
+  }
 
   return (
     <>
@@ -254,7 +285,7 @@ const addItem = async () => {
         </FormDialog>
         {rows.fetchStatus === "error" && <Alert severity="error">Ocurrio un error al obtener los datos!</Alert>}
         {rows.fetchStatus === "loading" && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
-        {rows.fetchStatus === "success" && <Table rows={rows.data} columns={columns}></Table>}
+        {rows.fetchStatus === "success" && <Table rows={rows.data} columns={columns} columnVisibilityModel={columnVisibilityModel}></Table>}
       </Box>
     </>
   );
