@@ -58,6 +58,7 @@ export default function Products() {
     detail: '',
     imageUrl: '',
     price: 0,
+    stock: 0,
   }
   const [item, setItem] = useState<Interface>(defaultItem)
   
