@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -30,7 +29,7 @@ export default function FormDialog(props: PropsType) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={setClose}>Cancelar</Button>
-                    <Button onClick={subscribe}>Guardar</Button>
+                    <Button onClick={subscribe} type="submit">Guardar</Button>
                 </DialogActions>
             </Dialog>
         </div>

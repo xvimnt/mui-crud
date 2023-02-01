@@ -42,6 +42,7 @@ export default function Products() {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [emptyField, setEmptyField] = useState(false);
 
   // Item
   const defaultItem: Product = {
@@ -51,13 +52,15 @@ export default function Products() {
     imageUrl: "https://images.unsplash.com/photo-1545289414-1c3cb1c06238?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
     price: 0,
   }
-
   const [item, setItem] = useState<Product>(defaultItem)
 
+
   // Fields
-  const fields = <>
+  const fields = <form>
     <TextField
       autoFocus
+      required
+      error={emptyField && item.id === defaultItem.id}
       margin="dense"
       id="id"
       label="Codigo"
@@ -69,6 +72,8 @@ export default function Products() {
     />
     <TextField
       autoFocus
+      required
+      error={emptyField && item.name === defaultItem.name}
       margin="dense"
       id="name"
       label="Nombre"
@@ -80,6 +85,8 @@ export default function Products() {
     />
     <TextField
       autoFocus
+      required
+      error={emptyField && item.detail === defaultItem.detail}
       margin="dense"
       id="detail"
       label="Detalle"
@@ -93,6 +100,8 @@ export default function Products() {
     />
     <TextField
       autoFocus
+      required
+      error={emptyField && item.price === defaultItem.price}
       margin="dense"
       id="price"
       label="Precio"
@@ -102,27 +111,37 @@ export default function Products() {
       value={item.price}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, price: Number(event.target.value) })}
     />
-  </>
+  </form>
 
   // Functions 
   const addItem = async () => {
-    await dispatch(addProduct(item))
-    setItem(defaultItem)
+    if (item.id && item.name && item.detail && item.price) {
+      await dispatch(addProduct(item))
+      setItem(defaultItem)
+    } else {
+      setEmptyField(true)
+    }
   }
 
   const closeAdd = () => {
     setAddOpen(false)
     setItem(defaultItem)
+    setEmptyField(false)
   }
 
   const editItem = async () => {
-    await dispatch(updateProduct(item))
-    setEditOpen(false)
+    if (item.id && item.name && item.detail && item.price) {
+      await dispatch(updateProduct(item))
+      setEditOpen(false)
+    } else {
+      setEmptyField(true)
+    }
   }
 
   const closeEdit = () => {
     setEditOpen(false)
     setItem(defaultItem)
+    setEmptyField(false)
   }
 
   const deleteItem = async () => {
