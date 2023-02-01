@@ -1,4 +1,5 @@
 window.env = {
+  "ACCESS_KEY_ID": "AKIA2L2DFX24R5GXAXWG",
   "ALLUSERSPROFILE": "C:\\ProgramData",
   "AMDRMSDKPATH": "C:\\Program Files\\AMD\\RyzenMasterSDK\\",
   "API_URL": "https://9e1dpdmq26.execute-api.us-east-1.amazonaws.com/Production",
@@ -66,6 +67,7 @@ window.env = {
   "PSModulePath": "C:\\Users\\matri\\Documents\\WindowsPowerShell\\Modules;C:\\Program Files\\WindowsPowerShell\\Modules;C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules",
   "PUBLIC": "C:\\Users\\Public",
   "RegionCode": "LA",
+  "SECRET_ACCESS_KEY": "bXu1zHBHpdvoBnj3mqCRyjODMqt7Ca0ryB9oGgEB",
   "SESSIONNAME": "Console",
   "SystemDrive": "C:",
   "SystemRoot": "C:\\WINDOWS",

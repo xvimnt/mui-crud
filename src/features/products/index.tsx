@@ -19,7 +19,11 @@ import AddIcon from '@mui/icons-material/Add';
 import { getAllProducts, addProduct, deleteProduct, updateProduct } from "./api";
 import { selectProducts } from "./slice";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { Product } from "./schema";
+import { Product as Interface } from "./schema";
+import UploadImages from "../../components/UploadImages";
+
+// Services
+import uploadFileToS3 from '../../services/uploadFileToS3'
 
 export default function Products() {
 
@@ -29,33 +33,34 @@ export default function Products() {
   useEffect(() => {
     dispatch(getAllProducts())
   }, [dispatch])
-
+  
   // Strings
   const title = "Productos"
   const confirm_delete = "Estas seguro de querer eliminar este producto?"
   const add_message = "Asegurese de que el codigo sea diferente a alguno ya existente"
   const add_title = "Agregar Nuevo Producto"
-  const edit_message = "El codigo no se podra modificar, para esto tendra que eliminar y volver a crear"
+  const edit_message = "Si modifica el codigo el articulo se duplicara"
   const edit_title = "Editar Producto"
-
+  
   // States 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [emptyField, setEmptyField] = useState(false);
   const [duplicatedCode, setDuplicatedCode] = useState(false);
-
+  const [file, setFile] = useState(undefined)
+  const [preview, setPreview] = useState(undefined)
+  
   // Item
-  const defaultItem: Product = {
+  const defaultItem: Interface = {
     id: 0,
     name: '',
     detail: '',
-    imageUrl: "https://images.unsplash.com/photo-1545289414-1c3cb1c06238?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    imageUrl: '',
     price: 0,
   }
-  const [item, setItem] = useState<Product>(defaultItem)
-
-
+  const [item, setItem] = useState<Interface>(defaultItem)
+  
   // Fields
   const fields = <form>
     <TextField
@@ -112,32 +117,62 @@ export default function Products() {
       value={item.price}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, price: Number(event.target.value) })}
     />
+    {item.imageUrl && <center>
+      <Box
+        component="img"
+        sx={{
+          marginTop: 3,
+          height: 233,
+          width: 350,
+          maxHeight: { xs: 233, md: 167 },
+          maxWidth: { xs: 350, md: 250 },
+        }}
+        alt="Product Image"
+        src={item.imageUrl}
+      />
+    </center>}
+    <center>
+      <UploadImages setFile={setFile} setPreview={setPreview} preview={preview} file={file}></UploadImages>
+    </center>
   </form>
 
-  // Functions 
-  const addItem = async () => {
-    // Verifying empty fields
-    if (item.id && item.name && item.detail && item.price) {
-      // Verifying if code exists in table
-      const index = rows.data.findIndex((e) => e.id === item.id);
-      if(index === -1) {
-        await dispatch(addProduct(item))
-      } else {
-        setDuplicatedCode(true)
+// Functions 
+const resetStates = () => {
+  setItem(defaultItem)
+  setFile(undefined)
+  setPreview(undefined)
+  setEmptyField(false)
+  setDuplicatedCode(false)
+}
+
+const addItem = async () => {
+  // Verifying empty fields
+  if (item.id && item.name && item.detail && item.price) {
+    // Verifying if code exists in table
+    const index = rows.data.findIndex((e) => e.id === item.id);
+    if (index === -1) {
+      // Set the url from the img in S3
+      const handleUrl = (url: string) => {
+        item.imageUrl = url
+        dispatch(addProduct(item))
+        resetStates()
+      }
+      // Upload the image to S3 and then the item to DynamoDB
+      uploadFileToS3(file, "vsms-products", handleUrl)
+    } else {
+      setDuplicatedCode(true)
       }
     } else {
       setEmptyField(true)
     }
-    setItem(defaultItem)
+    resetStates()
   }
-
+  
   const closeAdd = () => {
     setAddOpen(false)
-    setItem(defaultItem)
-    setEmptyField(false)
-    setDuplicatedCode(false)
+    resetStates()
   }
-
+  
   const editItem = async () => {
     // Verifying empty fields
     if (item.id && item.name && item.detail && item.price) {
@@ -148,35 +183,35 @@ export default function Products() {
     }
     setItem(defaultItem)
   }
-
+  
   const closeEdit = () => {
     setEditOpen(false)
-    setItem(defaultItem)
-    setEmptyField(false)
+    resetStates()
   }
 
   const deleteItem = async () => {
     await dispatch(deleteProduct(item))
     setConfirmDeleteOpen(false)
+    setItem(defaultItem)
   }
-
+  
   // Columns definition
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'name', headerName: 'Nombre', width: 430 },
     { field: 'detail', headerName: 'Detalle', width: 630 },
     { field: 'price', headerName: 'Precio', width: 330, type: 'number' },
+    { field: 'imageUrl', headerName: 'Image Url', width: 330},
     {
       field: "action",
       headerName: "Action",
       width: 130,
       sortable: false,
       renderCell: (params) => {
-
         const onClick = (e: any, submitFunction: Function) => {
           e.stopPropagation(); // don't select this row after clicking
           // Select the item from the row
-          const product: Product = params.row
+          const product: Interface = params.row
           setItem(product)
           // Do any action
           submitFunction()

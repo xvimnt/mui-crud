@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { addProduct, deleteProduct, getAllProducts, updateProduct } from "./api"
-import { Product } from "./schema"
+import { Product as Interface} from "./schema"
 import { RootState } from '../../app/store';
 
 // Define a type for the slice state
 export interface ProductState {
-    data: Product[],
+    data: Interface[],
     fetchStatus: String
 }
 
