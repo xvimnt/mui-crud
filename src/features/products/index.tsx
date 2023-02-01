@@ -43,6 +43,7 @@ export default function Products() {
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [emptyField, setEmptyField] = useState(false);
+  const [duplicatedCode, setDuplicatedCode] = useState(false);
 
   // Item
   const defaultItem: Product = {
@@ -115,27 +116,37 @@ export default function Products() {
 
   // Functions 
   const addItem = async () => {
+    // Verifying empty fields
     if (item.id && item.name && item.detail && item.price) {
-      await dispatch(addProduct(item))
-      setItem(defaultItem)
+      // Verifying if code exists in table
+      const index = rows.data.findIndex((e) => e.id === item.id);
+      if(index == -1) {
+        await dispatch(addProduct(item))
+      } else {
+        setDuplicatedCode(true)
+      }
     } else {
       setEmptyField(true)
     }
+    setItem(defaultItem)
   }
 
   const closeAdd = () => {
     setAddOpen(false)
     setItem(defaultItem)
     setEmptyField(false)
+    setDuplicatedCode(false)
   }
 
   const editItem = async () => {
+    // Verifying empty fields
     if (item.id && item.name && item.detail && item.price) {
       await dispatch(updateProduct(item))
       setEditOpen(false)
     } else {
       setEmptyField(true)
     }
+    setItem(defaultItem)
   }
 
   const closeEdit = () => {
@@ -199,6 +210,7 @@ export default function Products() {
           {confirm_delete}
         </ConfirmDialog>
         <FormDialog title={add_title} open={addOpen} text={add_message} subscribe={addItem} setClose={closeAdd}>
+          {duplicatedCode && <Alert severity="error">Codigo Existente!</Alert>}
           {fields}
         </FormDialog>
         <FormDialog title={edit_title} open={editOpen} text={edit_message} subscribe={editItem} setClose={closeEdit}>
