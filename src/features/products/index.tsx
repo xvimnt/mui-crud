@@ -120,7 +120,7 @@ export default function Products() {
     if (item.id && item.name && item.detail && item.price) {
       // Verifying if code exists in table
       const index = rows.data.findIndex((e) => e.id === item.id);
-      if(index == -1) {
+      if(index === -1) {
         await dispatch(addProduct(item))
       } else {
         setDuplicatedCode(true)
