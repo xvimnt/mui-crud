@@ -8,30 +8,19 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 interface PropsType {
     title: any,
-    button_title: any,
     text: String,
     children: any,
     subscribe: any,
+    open: boolean,
+    setClose: any,
 }
 
 export default function FormDialog(props: PropsType) {
-    const {title, button_title, text, children, subscribe} = props
-    const [open, setOpen] = React.useState(false);
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const {title, text, children, subscribe, open, setClose} = props
 
     return (
         <div>
-            <Button variant="outlined" onClick={handleClickOpen}>
-                {button_title}
-            </Button>
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog open={open} onClose={setClose}>
                 <DialogTitle>{title}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -40,7 +29,7 @@ export default function FormDialog(props: PropsType) {
                     {children}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button onClick={setClose}>Cancelar</Button>
                     <Button onClick={subscribe}>Guardar</Button>
                 </DialogActions>
             </Dialog>

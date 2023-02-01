@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+
+// Components
 import Table from "../../components/Table";
 import FormDialog from "../../components/FormDialog";
+import ConfirmDialog from "../../components/ConfimDialog";
 
 // MUI
 import Typography from '@mui/material/Typography';
@@ -17,8 +20,6 @@ import { getAllProducts, addProduct, deleteProduct, updateProduct } from "./api"
 import { selectProducts } from "./slice";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Product } from "./schema";
-import ConfirmDialog from "../../components/ConfimDialog";
-
 
 export default function Products() {
 
@@ -29,6 +30,105 @@ export default function Products() {
     dispatch(getAllProducts())
   }, [dispatch])
 
+  // Strings
+  const title = "Productos"
+  const confirm_delete = "Estas seguro de querer eliminar este producto?"
+  const add_message = "Asegurese de que el codigo sea diferente a alguno ya existente"
+  const add_title = "Agregar Nuevo Producto"
+  const edit_message = "El codigo no se podra modificar, para esto tendra que eliminar y volver a crear"
+  const edit_title = "Editar Producto"
+
+  // States 
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  // Item
+  const defaultItem: Product = {
+    id: 0,
+    name: '',
+    detail: '',
+    imageUrl: "https://images.unsplash.com/photo-1545289414-1c3cb1c06238?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    price: 0,
+  }
+
+  const [item, setItem] = useState<Product>(defaultItem)
+
+  // Fields
+  const fields = <>
+    <TextField
+      autoFocus
+      margin="dense"
+      id="id"
+      label="Codigo"
+      type="number"
+      fullWidth
+      variant="standard"
+      value={item.id}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, id: Number(event.target.value) })}
+    />
+    <TextField
+      autoFocus
+      margin="dense"
+      id="name"
+      label="Nombre"
+      type="text"
+      fullWidth
+      variant="standard"
+      value={item.name}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, name: event.target.value })}
+    />
+    <TextField
+      autoFocus
+      margin="dense"
+      id="detail"
+      label="Detalle"
+      type="text"
+      fullWidth
+      variant="standard"
+      multiline
+      maxRows={4}
+      value={item.detail}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, detail: event.target.value })}
+    />
+    <TextField
+      autoFocus
+      margin="dense"
+      id="price"
+      label="Precio"
+      type="number"
+      fullWidth
+      variant="standard"
+      value={item.price}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, price: Number(event.target.value) })}
+    />
+  </>
+
+  // Functions 
+  const addItem = async () => {
+    await dispatch(addProduct(item))
+    setItem(defaultItem)
+  }
+
+  const closeAdd = () => {
+    setAddOpen(false)
+    setItem(defaultItem)
+  }
+
+  const editItem = async () => {
+    await dispatch(updateProduct(item))
+    setEditOpen(false)
+  }
+
+  const closeEdit = () => {
+    setEditOpen(false)
+    setItem(defaultItem)
+  }
+
+  const deleteItem = async () => {
+    await dispatch(deleteProduct(item))
+    setConfirmDeleteOpen(false)
+  }
 
   // Columns definition
   const columns: GridColDef[] = [
@@ -54,119 +154,35 @@ export default function Products() {
 
         return (
           <ButtonGroup variant="contained" aria-label="outlined primary button group">
-            <Button size="small" onClick={(e) => onClick(e, () => setConfirmOpen(true))}><EditIcon></EditIcon></Button>
-            <Button size="small" onClick={(e) => onClick(e, () => setConfirmOpen(true))}><DeleteIcon></DeleteIcon></Button>
+            <Button size="small" onClick={(e) => onClick(e, () => setEditOpen(true))}><EditIcon></EditIcon></Button>
+            <Button size="small" onClick={(e) => onClick(e, () => setConfirmDeleteOpen(true))}><DeleteIcon></DeleteIcon></Button>
           </ButtonGroup>
         );
       }
     },
   ];
 
-  // Strings
-  const title = "Productos"
-  const confirm_delete = "Estas seguro de querer eliminar este producto?"
-  const add_message = "Asegurese de que el codigo sea diferente a alguno ya existente"
-  const add_title = "Agregar Nuevo Producto"
-
-  // States 
-  const [id, setId] = useState(0)
-  const [name, setName] = useState('')
-  const [detail, setDetail] = useState('')
-  const [price, setPrice] = useState(0)
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  // Item
-  const defaultItem: Product = {
-    id: id,
-    name: name,
-    detail: detail,
-    imageUrl: "https://images.unsplash.com/photo-1545289414-1c3cb1c06238?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
-    price: price,
-  }
-  const [item, setItem] = useState<Product>(defaultItem)
-
-  // Fields
-  const fields = <>
-    <TextField
-      autoFocus
-      margin="dense"
-      id="id"
-      label="Codigo"
-      type="number"
-      fullWidth
-      variant="standard"
-      value={id}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setId(Number(event.target.value))}
-    />
-    <TextField
-      autoFocus
-      margin="dense"
-      id="name"
-      label="Nombre"
-      type="text"
-      fullWidth
-      variant="standard"
-      value={name}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)}
-    />
-    <TextField
-      autoFocus
-      margin="dense"
-      id="detail"
-      label="Detalle"
-      type="text"
-      fullWidth
-      variant="standard"
-      multiline
-      maxRows={4}
-      value={detail}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDetail(event.target.value)}
-    />
-    <TextField
-      autoFocus
-      margin="dense"
-      id="price"
-      label="Precio"
-      type="number"
-      fullWidth
-      variant="standard"
-      value={price}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPrice(Number(event.target.value))}
-    />
-  </>
-
-  // Functions 
-  const addItem = async () => {
-    await dispatch(addProduct(defaultItem))
-
-    setId(0)
-    setName('')
-    setDetail('')
-    setPrice(0)
-  }
-
-  const deleteItem = async () => {
-    await dispatch(deleteProduct(item))
-    setConfirmOpen(false)
-    setItem(defaultItem)
-  }
-
   return (
     <>
       <Box sx={{ width: '100%', height: '100%' }}>
         <Typography variant="h3" gutterBottom>
           {title}
+          <Button sx={{ marginLeft: 2 }} size="small" variant="contained" onClick={() => setAddOpen(true)}>
+            <AddIcon />
+          </Button>
         </Typography>
         <ConfirmDialog
           title="Eliminar Item?"
-          open={confirmOpen}
-          setOpen={setConfirmOpen}
+          open={confirmDeleteOpen}
+          setOpen={setConfirmDeleteOpen}
           onConfirm={deleteItem}
         >
           {confirm_delete}
         </ConfirmDialog>
-        <Button variant="outlined" onClick={() => setConfirmOpen(true)}>{<><DeleteIcon /> Borrar Seleccionados</>}</Button>
-        <FormDialog title={add_title} button_title={<><AddIcon /> Agregar</>} text={add_message} subscribe={addItem}>
+        <FormDialog title={add_title} open={addOpen} text={add_message} subscribe={addItem} setClose={closeAdd}>
+          {fields}
+        </FormDialog>
+        <FormDialog title={edit_title} open={editOpen} text={edit_message} subscribe={editItem} setClose={closeEdit}>
           {fields}
         </FormDialog>
         {rows.fetchStatus === "error" && <Alert severity="error">Ocurrio un error al obtener los datos!</Alert>}
