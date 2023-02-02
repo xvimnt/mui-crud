@@ -39,6 +39,7 @@ dynamodb.createTable(params, function(err, data) {
           "name": "First Item",
           "detail": "First Item Description",
           "price": 120,
+          "category": "Categoria de Ejemplo",
           "stock": 10,
           "imageUrl": "https://github.com/ebenezerdon/shopping-cart-images/blob/main/robot1.png?raw=true"
       }

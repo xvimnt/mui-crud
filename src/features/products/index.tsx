@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { GridColDef, GridColumnVisibilityModel } from '@mui/x-data-grid';
-import { Alert, Button, ButtonGroup, CircularProgress, LinearProgress } from "@mui/material";
+import { Alert, Button, ButtonGroup, LinearProgress, MenuItem } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,6 +22,9 @@ import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Product as Interface } from "./schema";
 import UploadImages from "../../components/UploadImages";
 
+// Categories
+import { selectCategories } from "../categories/slice";
+import { getAllCategories } from "../categories/api";
 // Services
 import uploadFileToS3 from '../../services/uploadFileToS3'
 
@@ -29,7 +32,11 @@ export default function Products() {
 
   // Get Rows
   const rows = useAppSelector(selectProducts);
+  const categories = useAppSelector(selectCategories);
   const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(getAllCategories())
+  }, [dispatch])
   useEffect(() => {
     dispatch(getAllProducts())
   }, [dispatch])
@@ -39,7 +46,7 @@ export default function Products() {
   const confirm_delete = "Estas seguro de querer eliminar este producto?"
   const add_message = "Asegurese de que el codigo sea diferente a alguno ya existente"
   const add_title = "Agregar Nuevo Producto"
-  const edit_message = "Si modifica el codigo el articulo se duplicara"
+  const edit_message = "Para cambiar el codigo debera volver a crear el producto"
   const edit_title = "Editar Producto"
 
   // States 
@@ -55,6 +62,7 @@ export default function Products() {
   const defaultItem: Interface = {
     id: 0,
     name: '',
+    category: '',
     detail: '',
     imageUrl: '',
     price: 0,
@@ -69,7 +77,7 @@ export default function Products() {
       autoFocus
       required
       disabled={editOpen}
-      error={emptyField && item.id > 0}
+      error={emptyField && item.id <= 0}
       margin="dense"
       id="id"
       label="Codigo"
@@ -80,6 +88,22 @@ export default function Products() {
       onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setItem({ ...item, id: Number(event.target.value) })}
     />
+    <TextField
+      select
+      fullWidth
+      error={emptyField && item.category == defaultItem.category}
+      label="Categoria"
+      variant="standard"
+      value={item.category}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+        setItem({ ...item, category: event.target.value })}
+    >
+      {categories.data.map((option) => (
+        <MenuItem key={option.id} value={option.name}>
+          {option.name}
+        </MenuItem>
+      ))}
+    </TextField>
     <TextField
       autoFocus
       required
@@ -176,7 +200,7 @@ export default function Products() {
     // Verify if required fields are valid
     if (item.id > 0 && item.name && item.detail && item.price && (item.stock >= 0) && (item.imageUrl || preview)) {
       // Edit doesn't need to compare codes
-      if(editOpen) return true
+      if (editOpen) return true
       // Look for existing code
       const index = rows.data.findIndex((e) => e.id === item.id);
       if (index === -1) {
@@ -275,6 +299,7 @@ export default function Products() {
     { field: 'id', headerName: 'ID', flex: 2, type: 'number' },
     { field: 'name', headerName: 'Nombre', flex: 10 },
     { field: 'detail', headerName: 'Detalle', flex: 10 },
+    { field: 'category', headerName: 'Categoria', flex: 10 },
     { field: 'price', headerName: 'Precio', flex: 5, type: 'number' },
     { field: 'imageUrl', headerName: 'Image Url', flex: 10 },
     { field: 'stock', headerName: 'Disponibles', flex: 5, type: 'number' },

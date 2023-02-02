@@ -24,8 +24,8 @@ import { Category as Interface } from "./schema";
 export default function Categories() {
 
   // Get Rows
-  const rows = useAppSelector(selectCategories);
   const dispatch = useAppDispatch();
+  const rows = useAppSelector(selectCategories);
   useEffect(() => {
     dispatch(getAllCategories())
   }, [dispatch])
@@ -35,7 +35,7 @@ export default function Categories() {
   const confirm_delete = "Estas seguro de querer eliminar esta Categoria?"
   const add_message = "Asegurese de que el codigo sea diferente a alguno ya existente"
   const add_title = "Agregar Nuevo Categoria"
-  const edit_message = "Para cambiar el codigo debera volver a crear el item"
+  const edit_message = "Para cambiar el codigo debera volver a crear la categoria"
   const edit_title = "Editar Categoria"
 
   // States 
