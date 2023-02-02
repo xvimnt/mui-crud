@@ -33,7 +33,7 @@ export default function Products() {
   useEffect(() => {
     dispatch(getAllProducts())
   }, [dispatch])
-  
+
   // Strings
   const title = "Productos"
   const confirm_delete = "Estas seguro de querer eliminar este producto?"
@@ -41,7 +41,7 @@ export default function Products() {
   const add_title = "Agregar Nuevo Producto"
   const edit_message = "Si modifica el codigo el articulo se duplicara"
   const edit_title = "Editar Producto"
-  
+
   // States 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
@@ -50,7 +50,7 @@ export default function Products() {
   const [duplicatedCode, setDuplicatedCode] = useState(false);
   const [file, setFile] = useState(undefined)
   const [preview, setPreview] = useState(undefined)
-  
+
   // Item
   const defaultItem: Interface = {
     id: 0,
@@ -61,7 +61,7 @@ export default function Products() {
     stock: 0,
   }
   const [item, setItem] = useState<Interface>(defaultItem)
-  
+
   // Fields
   const fields = <form>
     <TextField
@@ -146,70 +146,75 @@ export default function Products() {
       />
     </center>}
     <center>
+      {emptyField && (item.imageUrl === "" || preview === undefined) && <Alert severity="error">No ha seleccionado ninguna imagen!</Alert>}
       <UploadImages setFile={setFile} setPreview={setPreview} preview={preview} file={file}></UploadImages>
     </center>
   </form>
 
+  // Functions 
+  const resetStates = () => {
+    setItem(defaultItem)
+    setFile(undefined)
+    setPreview(undefined)
+    setEmptyField(false)
+    setDuplicatedCode(false)
+  }
 
-// Functions 
-const resetStates = () => {
-  setItem(defaultItem)
-  setFile(undefined)
-  setPreview(undefined)
-  setEmptyField(false)
-  setDuplicatedCode(false)
-}
-
-const addItem = async () => {
-  // Verifying empty fields
-  if (item.id && item.name && item.detail && item.price && item.stock) {
-    // Verifying if code exists in table
-    const index = rows.data.findIndex((e) => e.id === item.id);
-    if (index === -1) {
-      // Set the url from the img in S3
-      const handleUrl = (url: string) => {
-        item.imageUrl = url
-        dispatch(addProduct(item))
-        resetStates()
-      }
-      // Upload the image to S3 and then the item to DynamoDB
-      uploadFileToS3(file, "vsms-products", handleUrl)
-    } else {
-      setDuplicatedCode(true)
-      }
-    } else {
+  const fieldsAreFilled = () => {
+    if (item.id && item.name && item.detail && item.price && item.stock && (item.imageUrl || preview)) {
+      return true
+    }
+    else {
       setEmptyField(true)
+      return false
     }
   }
-  
+
+  const addItem = async () => {
+    // Verifying empty fields
+    if (fieldsAreFilled()) {
+      // Verifying if code exists in table
+      const index = rows.data.findIndex((e) => e.id === item.id);
+      if (index === -1) {
+        // Set the url from the img in S3
+        const handleUrl = (url: string) => {
+          item.imageUrl = url
+          dispatch(addProduct(item))
+          resetStates()
+        }
+        // Upload the image to S3 and then the item to DynamoDB
+        uploadFileToS3(file, "vsms-products", handleUrl)
+      } else {
+        setDuplicatedCode(true)
+      }
+    }
+  }
+
   const closeAdd = () => {
     setAddOpen(false)
     resetStates()
   }
-  
+
   const editItem = async () => {
     // Verifying empty fields
-    if (item.id && item.name && item.detail && item.price && item.stock) {
+    if (fieldsAreFilled()) {
       // Set the url from the img in S3
       const handleUrl = (url: string) => {
-        if(item.imageUrl !== url)  {
+        if (item.imageUrl !== url) {
           // Delete the previous url
           // Set the new Image
           item.imageUrl = url
-        } 
-        
+        }
+
         dispatch(updateProduct(item))
         resetStates()
         setEditOpen(false)
       }
       // Upload the image to S3 and then the item to DynamoDB
       uploadFileToS3(file, "vsms-products", handleUrl)
-      
-    } else {
-      setEmptyField(true)
     }
   }
-  
+
   const closeEdit = () => {
     setEditOpen(false)
     resetStates()
@@ -220,7 +225,7 @@ const addItem = async () => {
     setConfirmDeleteOpen(false)
     resetStates()
   }
-  
+
   // Columns definition
   const columns: GridColDef[] = [
     {
@@ -250,9 +255,9 @@ const addItem = async () => {
     { field: 'name', headerName: 'Nombre', flex: 10 },
     { field: 'detail', headerName: 'Detalle', flex: 10 },
     { field: 'price', headerName: 'Precio', flex: 5, type: 'number' },
-    { field: 'imageUrl', headerName: 'Image Url', flex: 10},
-    { field: 'stock', headerName: 'Disponibles', flex: 5, type: 'number'},
-    
+    { field: 'imageUrl', headerName: 'Image Url', flex: 10 },
+    { field: 'stock', headerName: 'Disponibles', flex: 5, type: 'number' },
+
   ];
   // Hide columns
   const columnVisibilityModel: GridColumnVisibilityModel = {
