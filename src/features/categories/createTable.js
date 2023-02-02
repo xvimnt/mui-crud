@@ -5,7 +5,7 @@ AWS.config.update({
 });
 
 // TableName should be in lowercase
-var tableName = "products"
+var tableName = "categories"
 
 var dynamodb = new AWS.DynamoDB();
 var documentClient = new AWS.DynamoDB.DocumentClient();
@@ -36,16 +36,13 @@ dynamodb.createTable(params, function(err, data) {
       TableName: tableName,
       Item: {
           "id": 1,
-          "name": "First Item",
-          "detail": "First Item Description",
-          "price": 120,
-          "stock": 10,
-          "imageUrl": "https://github.com/ebenezerdon/shopping-cart-images/blob/main/robot1.png?raw=true"
+          "name": "Categoria de Ejemplo",
+          "detail": "Decripcion de Ejemplo",
       }
   };
 
-  console.log("Adding a new item...");
-  documentClient.put(params, function(err, data) {
+    console.log("Adding a new item...");
+    documentClient.put(params, function(err, data) {
       if (err) {
           console.error("Error JSON:", JSON.stringify(err, null, 2));
       } else {

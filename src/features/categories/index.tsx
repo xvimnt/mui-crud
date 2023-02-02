@@ -10,37 +10,33 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { GridColDef, GridColumnVisibilityModel } from '@mui/x-data-grid';
-import { Alert, Button, ButtonGroup, CircularProgress, LinearProgress } from "@mui/material";
+import { Alert, Button, ButtonGroup, LinearProgress } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
 // API
-import { getAllProducts, addProduct, deleteProduct, updateProduct } from "./api";
-import { selectProducts } from "./slice";
+import { getAllCategories, addCategory, deleteCategory, updateCategory } from "./api";
+import { selectCategories } from "./slice";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { Product as Interface } from "./schema";
-import UploadImages from "../../components/UploadImages";
+import { Category as Interface } from "./schema";
 
-// Services
-import uploadFileToS3 from '../../services/uploadFileToS3'
-
-export default function Products() {
+export default function Categories() {
 
   // Get Rows
-  const rows = useAppSelector(selectProducts);
+  const rows = useAppSelector(selectCategories);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(getAllProducts())
+    dispatch(getAllCategories())
   }, [dispatch])
 
   // Strings
-  const title = "Productos"
-  const confirm_delete = "Estas seguro de querer eliminar este producto?"
+  const title = "Categorias"
+  const confirm_delete = "Estas seguro de querer eliminar esta Categoria?"
   const add_message = "Asegurese de que el codigo sea diferente a alguno ya existente"
-  const add_title = "Agregar Nuevo Producto"
-  const edit_message = "Si modifica el codigo el articulo se duplicara"
-  const edit_title = "Editar Producto"
+  const add_title = "Agregar Nuevo Categoria"
+  const edit_message = "Para cambiar el codigo debera volver a crear el item"
+  const edit_title = "Editar Categoria"
 
   // States 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -48,17 +44,12 @@ export default function Products() {
   const [editOpen, setEditOpen] = useState(false);
   const [emptyField, setEmptyField] = useState(false);
   const [duplicatedCode, setDuplicatedCode] = useState(false);
-  const [file, setFile] = useState(undefined)
-  const [preview, setPreview] = useState(undefined)
 
   // Item
   const defaultItem: Interface = {
     id: 0,
     name: '',
     detail: '',
-    imageUrl: '',
-    price: 0,
-    stock: 0,
   }
   const [item, setItem] = useState<Interface>(defaultItem)
 
@@ -69,7 +60,7 @@ export default function Products() {
       autoFocus
       required
       disabled={editOpen}
-      error={emptyField && item.id > 0}
+      error={emptyField && item.id <= 0}
       margin="dense"
       id="id"
       label="Codigo"
@@ -110,61 +101,11 @@ export default function Products() {
       onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setItem({ ...item, detail: event.target.value })}
     />
-    <TextField
-      autoFocus
-      required
-      error={emptyField && item.price === defaultItem.price}
-      margin="dense"
-      id="price"
-      label="Precio"
-      type="number"
-      fullWidth
-      variant="standard"
-      value={item.price}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setItem({ ...item, price: Number(event.target.value) })}
-    />
-    <TextField
-      autoFocus
-      required
-      error={emptyField && item.stock < 0}
-      margin="dense"
-      id="stock"
-      label="Disponibles"
-      type="number"
-      fullWidth
-      variant="standard"
-      value={item.stock}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setItem({ ...item, stock: Number(event.target.value) })}
-    />
-    {item.imageUrl && !preview && <center>
-      <Box
-        component="img"
-        sx={{
-          marginTop: 3,
-          height: 233,
-          width: 350,
-          maxHeight: { xs: 233, md: 167 },
-          maxWidth: { xs: 350, md: 250 },
-        }}
-        alt="Product Image"
-        src={item.imageUrl}
-      />
-    </center>}
-    <center>
-      {emptyField &&
-        (item.imageUrl === "" && preview === undefined) &&
-        <Alert severity="error">No ha seleccionado ninguna imagen!</Alert>}
-      <UploadImages setFile={setFile} setPreview={setPreview} preview={preview} file={file}></UploadImages>
-    </center>
   </form>
 
   // Functions 
   const resetStates = () => {
     setItem(defaultItem)
-    setFile(undefined)
-    setPreview(undefined)
     setEmptyField(false)
     setDuplicatedCode(false)
   }
@@ -172,9 +113,8 @@ export default function Products() {
   const verifyFields = () => {
     setDuplicatedCode(false)
     setEmptyField(false)
-
     // Verify if required fields are valid
-    if (item.id > 0 && item.name && item.detail && item.price && (item.stock >= 0) && (item.imageUrl || preview)) {
+    if (item.id > 0 && item.name && item.detail) {
       // Edit doesn't need to compare codes
       if(editOpen) return true
       // Look for existing code
@@ -194,40 +134,17 @@ export default function Products() {
   const addItem = async () => {
     // Verifying empty fields
     if (verifyFields()) {
-      // Set the url from the img in S3
-      const handleUrl = (url: string) => {
-        const newItem = { ...item }
-        newItem.imageUrl = url
-        dispatch(addProduct(newItem))
-        resetStates()
-      }
-      // Upload the image to S3 and then the item to DynamoDB
-      uploadFileToS3(file, "vsms-products", handleUrl)
+      dispatch(addCategory(item))
+      resetStates()
     }
   }
 
   const editItem = async () => {
     // Verifying empty fields
     if (verifyFields()) {
-      // Set the url from the img in S3
-      const handleUrl = (url: string) => {
-        const newItem = { ...item }
-        if (item.imageUrl !== url) {
-          // Set the new Image
-          newItem.imageUrl = url
-          setItem(newItem)
-        }
-        dispatch(updateProduct(newItem))
-        resetStates()
-        setEditOpen(false)
-      }
-      // Upload the image to S3 and then the item to DynamoDB
-      // If the img is the same don't do anything and just call the function above
-      if (preview) {
-        uploadFileToS3(file, "vsms-products", handleUrl)
-      } else {
-        handleUrl(item.imageUrl)
-      }
+      dispatch(updateCategory(item))
+      resetStates()
+      setEditOpen(false)
     }
   }
 
@@ -242,7 +159,7 @@ export default function Products() {
   }
 
   const deleteItem = async () => {
-    await dispatch(deleteProduct(item))
+    await dispatch(deleteCategory(item))
     setConfirmDeleteOpen(false)
     resetStates()
   }
@@ -258,8 +175,8 @@ export default function Products() {
         const onClick = (e: any, submitFunction: Function) => {
           e.stopPropagation(); // don't select this row after clicking
           // Select the item from the row
-          const product: Interface = params.row
-          setItem(product)
+          const Category: Interface = params.row
+          setItem(Category)
           // Do any action
           submitFunction()
         };
@@ -275,9 +192,6 @@ export default function Products() {
     { field: 'id', headerName: 'ID', flex: 2, type: 'number' },
     { field: 'name', headerName: 'Nombre', flex: 10 },
     { field: 'detail', headerName: 'Detalle', flex: 10 },
-    { field: 'price', headerName: 'Precio', flex: 5, type: 'number' },
-    { field: 'imageUrl', headerName: 'Image Url', flex: 10 },
-    { field: 'stock', headerName: 'Disponibles', flex: 5, type: 'number' },
 
   ];
   // Hide columns

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import TopBar from './TopBar';
+import { Outlet, NavLink } from "react-router-dom";
 
 // MUI
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -66,9 +67,10 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
-const features = [{
-    label:'Productos', icon: <MonitorIcon />
-}]
+const features = [
+    { label: 'Productos', icon: <MonitorIcon />, path: "/products" },
+    { label: 'Categorias', icon: <MonitorIcon />, path: "/categories" },
+]
 
 export default function LeftBar() {
     const theme = useTheme();
@@ -119,26 +121,28 @@ export default function LeftBar() {
                 <Divider />
                 <List>
                     {features.map((obj, index) => (
-                        <ListItem key={obj.label} disablePadding sx={{ display: 'block' }}>
-                            <ListItemButton
-                                sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
-                                }}
-                            >
-                                <ListItemIcon
+                        <NavLink to={obj.path} key={obj.label} style={{ textDecoration: 'none', color: 'black' }}>
+                            <ListItem disablePadding sx={{ display: 'block'}}>
+                                <ListItemButton
                                     sx={{
-                                        minWidth: 0,
-                                        mr: open ? 3 : 'auto',
-                                        justifyContent: 'center',
+                                        minHeight: 48,
+                                        justifyContent: open ? 'initial' : 'center',
+                                        px: 2.5,
                                     }}
                                 >
-                                    {obj.icon}
-                                </ListItemIcon>
-                                <ListItemText primary={obj.label} sx={{ opacity: open ? 1 : 0 }} />
-                            </ListItemButton>
-                        </ListItem>
+                                    <ListItemIcon
+                                        sx={{
+                                            minWidth: 0,
+                                            mr: open ? 3 : 'auto',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        {obj.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={obj.label} sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
+                        </NavLink>
                     ))}
                 </List>
             </Drawer>
