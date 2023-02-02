@@ -75,7 +75,8 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={item.id}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, id: Number(event.target.value) })}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+        setItem({ ...item, id: Number(event.target.value) })}
     />
     <TextField
       autoFocus
@@ -88,7 +89,8 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={item.name}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, name: event.target.value })}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+        setItem({ ...item, name: event.target.value })}
     />
     <TextField
       autoFocus
@@ -103,7 +105,8 @@ export default function Products() {
       multiline
       maxRows={4}
       value={item.detail}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, detail: event.target.value })}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+        setItem({ ...item, detail: event.target.value })}
     />
     <TextField
       autoFocus
@@ -116,12 +119,13 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={item.price}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, price: Number(event.target.value) })}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+        setItem({ ...item, price: Number(event.target.value) })}
     />
     <TextField
       autoFocus
       required
-      error={emptyField && item.stock === defaultItem.stock}
+      error={emptyField && item.stock < 0}
       margin="dense"
       id="stock"
       label="Disponibles"
@@ -129,7 +133,8 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={item.stock}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setItem({ ...item, stock: Number(event.target.value) })}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+        setItem({ ...item, stock: Number(event.target.value) })}
     />
     {item.imageUrl && !preview && <center>
       <Box
@@ -146,7 +151,9 @@ export default function Products() {
       />
     </center>}
     <center>
-      {emptyField && (item.imageUrl === "" || preview === undefined) && <Alert severity="error">No ha seleccionado ninguna imagen!</Alert>}
+      {emptyField && 
+      (item.imageUrl === "" && preview === undefined) && 
+      <Alert severity="error">No ha seleccionado ninguna imagen!</Alert>}
       <UploadImages setFile={setFile} setPreview={setPreview} preview={preview} file={file}></UploadImages>
     </center>
   </form>
@@ -178,8 +185,9 @@ export default function Products() {
       if (index === -1) {
         // Set the url from the img in S3
         const handleUrl = (url: string) => {
-          item.imageUrl = url
-          dispatch(addProduct(item))
+          const newItem = {...item}
+          newItem.imageUrl = url
+          dispatch(addProduct(newItem))
           resetStates()
         }
         // Upload the image to S3 and then the item to DynamoDB
@@ -200,18 +208,23 @@ export default function Products() {
     if (fieldsAreFilled()) {
       // Set the url from the img in S3
       const handleUrl = (url: string) => {
+        const newItem = {...item}
         if (item.imageUrl !== url) {
-          // Delete the previous url
           // Set the new Image
-          item.imageUrl = url
+          newItem.imageUrl = url
+          setItem(newItem)
         }
-
-        dispatch(updateProduct(item))
+        dispatch(updateProduct(newItem))
         resetStates()
         setEditOpen(false)
       }
       // Upload the image to S3 and then the item to DynamoDB
-      uploadFileToS3(file, "vsms-products", handleUrl)
+      // If the img is the same don't do anything and just call the function above
+      if(preview) {
+        uploadFileToS3(file, "vsms-products", handleUrl)
+      } else {
+        handleUrl(item.imageUrl)
+      }
     }
   }
 

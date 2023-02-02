@@ -48,7 +48,6 @@ export const addProduct = createAsyncThunk(`add-${table_name}`, async (item: Int
 
 
 export const updateProduct = createAsyncThunk(`update-${table_name}`, async (item: Interface) => {
-
     const response = await axios({
         url: `/${table_name}/${item.id}`,
         baseURL: env.API_URL,
