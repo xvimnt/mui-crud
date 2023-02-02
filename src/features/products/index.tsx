@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { GridColDef, GridColumnVisibilityModel } from '@mui/x-data-grid';
-import { Alert, Button, ButtonGroup, LinearProgress } from "@mui/material";
+import { Alert, Button, ButtonGroup, CircularProgress, LinearProgress } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -64,6 +64,7 @@ export default function Products() {
 
   // Fields
   const fields = <form>
+    {duplicatedCode && <Alert severity="error">Codigo Existente!</Alert>}
     <TextField
       autoFocus
       required
@@ -75,7 +76,7 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={item.id}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setItem({ ...item, id: Number(event.target.value) })}
     />
     <TextField
@@ -89,7 +90,7 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={item.name}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setItem({ ...item, name: event.target.value })}
     />
     <TextField
@@ -105,7 +106,7 @@ export default function Products() {
       multiline
       maxRows={4}
       value={item.detail}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setItem({ ...item, detail: event.target.value })}
     />
     <TextField
@@ -119,7 +120,7 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={item.price}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setItem({ ...item, price: Number(event.target.value) })}
     />
     <TextField
@@ -133,7 +134,7 @@ export default function Products() {
       fullWidth
       variant="standard"
       value={item.stock}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setItem({ ...item, stock: Number(event.target.value) })}
     />
     {item.imageUrl && !preview && <center>
@@ -151,9 +152,9 @@ export default function Products() {
       />
     </center>}
     <center>
-      {emptyField && 
-      (item.imageUrl === "" && preview === undefined) && 
-      <Alert severity="error">No ha seleccionado ninguna imagen!</Alert>}
+      {emptyField &&
+        (item.imageUrl === "" && preview === undefined) &&
+        <Alert severity="error">No ha seleccionado ninguna imagen!</Alert>}
       <UploadImages setFile={setFile} setPreview={setPreview} preview={preview} file={file}></UploadImages>
     </center>
   </form>
@@ -167,48 +168,44 @@ export default function Products() {
     setDuplicatedCode(false)
   }
 
-  const fieldsAreFilled = () => {
-    if (item.id && item.name && item.detail && item.price && item.stock && (item.imageUrl || preview)) {
-      return true
-    }
-    else {
-      setEmptyField(true)
-      return false
-    }
-  }
-
-  const addItem = async () => {
-    // Verifying empty fields
-    if (fieldsAreFilled()) {
-      // Verifying if code exists in table
+  const verifyFields = () => {
+    // Verify if required fields are valid
+    if (item.id && item.name && item.detail && item.price && (item.stock >= 0) && (item.imageUrl || preview)) {
+      // Look for existing code
       const index = rows.data.findIndex((e) => e.id === item.id);
       if (index === -1) {
-        // Set the url from the img in S3
-        const handleUrl = (url: string) => {
-          const newItem = {...item}
-          newItem.imageUrl = url
-          dispatch(addProduct(newItem))
-          resetStates()
-        }
-        // Upload the image to S3 and then the item to DynamoDB
-        uploadFileToS3(file, "vsms-products", handleUrl)
+        return true
       } else {
         setDuplicatedCode(true)
       }
     }
+    else {
+      setEmptyField(true)
+    }
+    return false
   }
 
-  const closeAdd = () => {
-    setAddOpen(false)
-    resetStates()
+  const addItem = async () => {
+    // Verifying empty fields
+    if (verifyFields()) {
+      // Set the url from the img in S3
+      const handleUrl = (url: string) => {
+        const newItem = { ...item }
+        newItem.imageUrl = url
+        dispatch(addProduct(newItem))
+        resetStates()
+      }
+      // Upload the image to S3 and then the item to DynamoDB
+      uploadFileToS3(file, "vsms-products", handleUrl)
+    }
   }
 
   const editItem = async () => {
     // Verifying empty fields
-    if (fieldsAreFilled()) {
+    if (verifyFields()) {
       // Set the url from the img in S3
       const handleUrl = (url: string) => {
-        const newItem = {...item}
+        const newItem = { ...item }
         if (item.imageUrl !== url) {
           // Set the new Image
           newItem.imageUrl = url
@@ -220,12 +217,17 @@ export default function Products() {
       }
       // Upload the image to S3 and then the item to DynamoDB
       // If the img is the same don't do anything and just call the function above
-      if(preview) {
+      if (preview) {
         uploadFileToS3(file, "vsms-products", handleUrl)
       } else {
         handleUrl(item.imageUrl)
       }
     }
+  }
+
+  const closeAdd = () => {
+    setAddOpen(false)
+    resetStates()
   }
 
   const closeEdit = () => {
@@ -295,7 +297,6 @@ export default function Products() {
           {confirm_delete}
         </ConfirmDialog>
         <FormDialog title={add_title} open={addOpen} text={add_message} subscribe={addItem} setClose={closeAdd}>
-          {duplicatedCode && <Alert severity="error">Codigo Existente!</Alert>}
           {fields}
         </FormDialog>
         <FormDialog title={edit_title} open={editOpen} text={edit_message} subscribe={editItem} setClose={closeEdit}>

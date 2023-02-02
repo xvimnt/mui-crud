@@ -31,7 +31,6 @@ export const getAllProducts = createAsyncThunk(`get-all-${table_name}`, async ()
 })
  
 export const addProduct = createAsyncThunk(`add-${table_name}`, async (item: Interface) => {
-    console.log('adding', item)
     const response = await axios({
         url: `/${table_name}`,
         baseURL: env.API_URL,
