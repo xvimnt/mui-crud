@@ -1,6 +1,6 @@
 import * as React from 'react';
 import TopBar from './TopBar';
-import { Outlet, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 // MUI
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';

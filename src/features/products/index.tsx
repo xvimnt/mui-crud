@@ -1,19 +1,12 @@
 import { useEffect, useState } from "react";
 
-// Components
-import Table from "../../components/Table";
-import FormDialog from "../../components/FormDialog";
-import ConfirmDialog from "../../components/ConfimDialog";
-
 // MUI
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { GridColDef, GridColumnVisibilityModel } from '@mui/x-data-grid';
-import { Alert, Button, ButtonGroup, LinearProgress, MenuItem } from "@mui/material";
+import { Alert, Button, ButtonGroup, MenuItem } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 
 // API
 import { getAllProducts, addProduct, deleteProduct, updateProduct } from "./api";
@@ -27,6 +20,7 @@ import { selectCategories } from "../categories/slice";
 import { getAllCategories } from "../categories/api";
 // Services
 import uploadFileToS3 from '../../services/uploadFileToS3'
+import Crud from "../../components/Crud";
 
 export default function Products() {
 
@@ -43,11 +37,8 @@ export default function Products() {
 
   // Strings
   const title = "Productos"
-  const confirm_delete = "Estas seguro de querer eliminar este producto?"
-  const add_message = "Asegurese de que el codigo sea diferente a alguno ya existente"
-  const add_title = "Agregar Nuevo Producto"
-  const edit_message = "Para cambiar el codigo debera volver a crear el producto"
-  const edit_title = "Editar Producto"
+  const addTitle = "Agregar Producto"
+  const editTitle = "Editar Producto"
 
   // States 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -69,120 +60,6 @@ export default function Products() {
     stock: 0,
   }
   const [item, setItem] = useState<Interface>(defaultItem)
-
-  // Fields
-  const fields = <form>
-    {duplicatedCode && <Alert severity="error">Codigo Existente!</Alert>}
-    <TextField
-      autoFocus
-      required
-      disabled={editOpen}
-      error={emptyField && item.id <= 0}
-      margin="dense"
-      id="id"
-      label="Codigo"
-      type="number"
-      fullWidth
-      variant="standard"
-      value={item.id}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setItem({ ...item, id: Number(event.target.value) })}
-    />
-    <TextField
-      select
-      fullWidth
-      error={emptyField && item.category == defaultItem.category}
-      label="Categoria"
-      variant="standard"
-      value={item.category}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setItem({ ...item, category: event.target.value })}
-    >
-      {categories.data.map((option) => (
-        <MenuItem key={option.id} value={option.name}>
-          {option.name}
-        </MenuItem>
-      ))}
-    </TextField>
-    <TextField
-      autoFocus
-      required
-      error={emptyField && item.name === defaultItem.name}
-      margin="dense"
-      id="name"
-      label="Nombre"
-      type="text"
-      fullWidth
-      variant="standard"
-      value={item.name}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setItem({ ...item, name: event.target.value })}
-    />
-    <TextField
-      autoFocus
-      required
-      error={emptyField && item.detail === defaultItem.detail}
-      margin="dense"
-      id="detail"
-      label="Detalle"
-      type="text"
-      fullWidth
-      variant="standard"
-      multiline
-      maxRows={4}
-      value={item.detail}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setItem({ ...item, detail: event.target.value })}
-    />
-    <TextField
-      autoFocus
-      required
-      error={emptyField && item.price === defaultItem.price}
-      margin="dense"
-      id="price"
-      label="Precio"
-      type="number"
-      fullWidth
-      variant="standard"
-      value={item.price}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setItem({ ...item, price: Number(event.target.value) })}
-    />
-    <TextField
-      autoFocus
-      required
-      error={emptyField && item.stock < 0}
-      margin="dense"
-      id="stock"
-      label="Disponibles"
-      type="number"
-      fullWidth
-      variant="standard"
-      value={item.stock}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setItem({ ...item, stock: Number(event.target.value) })}
-    />
-    {item.imageUrl && !preview && <center>
-      <Box
-        component="img"
-        sx={{
-          marginTop: 3,
-          height: 233,
-          width: 350,
-          maxHeight: { xs: 233, md: 167 },
-          maxWidth: { xs: 350, md: 250 },
-        }}
-        alt="Product Image"
-        src={item.imageUrl}
-      />
-    </center>}
-    <center>
-      {emptyField &&
-        (item.imageUrl === "" && preview === undefined) &&
-        <Alert severity="error">No ha seleccionado ninguna imagen!</Alert>}
-      <UploadImages setFile={setFile} setPreview={setPreview} preview={preview} file={file}></UploadImages>
-    </center>
-  </form>
 
   // Functions 
   const resetStates = () => {
@@ -311,32 +188,81 @@ export default function Products() {
   }
 
   return (
-    <>
-      <Box sx={{ width: '100%', height: '100%' }}>
-        <Typography variant="h3" gutterBottom>
-          {title}
-          <Button sx={{ marginLeft: 2 }} size="small" variant="contained" onClick={() => setAddOpen(true)}>
-            <AddIcon />
-          </Button>
-        </Typography>
-        <ConfirmDialog
-          title="Eliminar Item?"
-          open={confirmDeleteOpen}
-          setOpen={setConfirmDeleteOpen}
-          onConfirm={deleteItem}
+    <Crud 
+    title={title} rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel} 
+    addTitle={addTitle} addOpen={addOpen} addItem={addItem} setAddOpen={setAddOpen} closeAdd={closeAdd}
+    editItem={editItem} editOpen={editOpen} editTitle={editTitle} closeEdit={closeEdit}
+    deleteItem={deleteItem} confirmDeleteOpen={confirmDeleteOpen} setConfirmDeleteOpen={setConfirmDeleteOpen}>
+      <form>
+        {duplicatedCode && <Alert severity="error">Codigo Existente!</Alert>}
+        <TextField 
+          autoFocus fullWidth required disabled={editOpen} error={emptyField && item.id <= 0}
+          margin="dense" id="id" label="Codigo" type="number" variant="standard"
+          value={item.id}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setItem({ ...item, id: Number(event.target.value) })}
+        />
+        <TextField
+          select fullWidth autoFocus required error={emptyField && item.category === defaultItem.category}
+          label="Categoria" variant="standard"
+          value={item.category}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setItem({ ...item, category: event.target.value })}
         >
-          {confirm_delete}
-        </ConfirmDialog>
-        <FormDialog title={add_title} open={addOpen} text={add_message} subscribe={addItem} setClose={closeAdd}>
-          {fields}
-        </FormDialog>
-        <FormDialog title={edit_title} open={editOpen} text={edit_message} subscribe={editItem} setClose={closeEdit}>
-          {fields}
-        </FormDialog>
-        {rows.fetchStatus === "error" && <Alert severity="error">Ocurrio un error al obtener los datos!</Alert>}
-        {rows.fetchStatus === "loading" && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
-        {rows.fetchStatus === "success" && <Table rows={rows.data} columns={columns} columnVisibilityModel={columnVisibilityModel}></Table>}
-      </Box>
-    </>
+          {categories.data.map((option) => (
+            <MenuItem key={option.id} value={option.name}>
+              {option.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField autoFocus fullWidth required error={emptyField && item.name === defaultItem.name}
+          margin="dense" id="name" label="Nombre" type="text" variant="standard"
+          value={item.name}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setItem({ ...item, name: event.target.value })}
+        />
+        <TextField
+          autoFocus fullWidth required error={emptyField && item.detail === defaultItem.detail} multiline
+          margin="dense" id="detail" label="Detalle" type="text" variant="standard" maxRows={4}
+          value={item.detail}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setItem({ ...item, detail: event.target.value })}
+        />
+        <TextField
+          autoFocus fullWidth required error={emptyField && item.price === defaultItem.price}
+          margin="dense" id="price" label="Precio" type="number" variant="standard"
+          value={item.price}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setItem({ ...item, price: Number(event.target.value) })}
+        />
+        <TextField
+          autoFocus fullWidth required error={emptyField && item.stock < 0}
+          margin="dense" id="stock" label="Disponibles" type="number" variant="standard"
+          value={item.stock}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setItem({ ...item, stock: Number(event.target.value) })}
+        />
+        {item.imageUrl && !preview && <center>
+          <Box
+            component="img"
+            sx={{
+              marginTop: 3,
+              height: 233,
+              width: 350,
+              maxHeight: { xs: 233, md: 167 },
+              maxWidth: { xs: 350, md: 250 },
+            }}
+            alt="Product Image"
+            src={item.imageUrl}
+          />
+        </center>}
+        <center>
+          {emptyField &&
+            (item.imageUrl === "" && preview === undefined) &&
+            <Alert severity="error">No ha seleccionado ninguna imagen!</Alert>}
+          <UploadImages setFile={setFile} setPreview={setPreview} preview={preview} file={file}></UploadImages>
+        </center>
+      </form>
+    </Crud>
   );
 }
