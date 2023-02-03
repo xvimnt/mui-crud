@@ -8,6 +8,7 @@ import env from "react-dotenv";
 // Features
 import Categories from "./features/categories";
 import Products from './features/products';
+import Dashboard from "./features/dashboard";
 
 AWS.config.update({
   accessKeyId: env.ACCESS_KEY_ID,
@@ -23,6 +24,7 @@ function App() {
         <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 6 }}>
           <Grid container>
             <Routes>
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/products" element={<Products />} />
               <Route path="/categories" element={<Categories />} />
             </Routes>
