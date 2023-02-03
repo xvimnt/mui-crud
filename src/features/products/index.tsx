@@ -243,17 +243,15 @@ export default function Products() {
             setItem({ ...item, stock: Number(event.target.value) })}
         />
         {item.imageUrl && !preview && <center>
-          <Box
-            component="img"
-            sx={{
+          <Box 
+            component="img" alt="Product Image" src={item.imageUrl}
+            sx={{ 
               marginTop: 3,
               height: 233,
               width: 350,
               maxHeight: { xs: 233, md: 167 },
               maxWidth: { xs: 350, md: 250 },
             }}
-            alt="Product Image"
-            src={item.imageUrl}
           />
         </center>}
         <center>
