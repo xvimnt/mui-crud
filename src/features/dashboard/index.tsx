@@ -5,7 +5,7 @@ import { Container, Grid, Box, Typography, LinearProgress } from "@mui/material"
 import { Money, Person, ArrowDownward, ArrowUpward, InsertChart, AttachMoney } from "@mui/icons-material";
 import { BarChart } from "../../components/BarChart";
 import { PieChart } from "../../components/PieChart";
-import { ProductsTable } from "../../components/ProductsTable";
+import { InfoTable } from "../../components/InfoTable";
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { selectProducts } from "../products/slice";
@@ -93,7 +93,7 @@ export default function Dashboard() {
                             xl={3}
                             xs={12}
                         >
-                            <ProductsTable products={products.data}/>
+                            <InfoTable rows={products.data} title="Mas Vendidos"/>
                         </Grid>
                         <Grid
                             item

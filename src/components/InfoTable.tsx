@@ -12,27 +12,31 @@ import {
 } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Product } from '../features/products/schema';
 
-export function ProductsTable (props: any) {
-    const { products } = props
+interface PropsType {
+    title: string,
+    rows: any[],
+}
+
+export function InfoTable (props: PropsType) {
+    const { rows, title } = props
     return (
         <Card>
             <CardHeader
-                subtitle={`${products.length} in total`}
-                title="Latest Products"
+                subtitle={`${rows.length} in total`}
+                title={title}
             />
             <Divider />
             <List>
-                {products.map((product: Product, i: number) => (
+                {rows.map((item: any, i: number) => (
                     <ListItem
-                        divider={i < products.length - 1}
-                        key={product.id}
+                        divider={i < rows.length - 1}
+                        key={item.id}
                     >
                         <ListItemAvatar>
                             <img
-                                alt={product.name}
-                                src={product.imageUrl}
+                                alt={item.name}
+                                src={item.imageUrl}
                                 style={{
                                     height: 48,
                                     width: 48
@@ -40,7 +44,7 @@ export function ProductsTable (props: any) {
                             />
                         </ListItemAvatar>
                         <ListItemText
-                            primary={product.name}
+                            primary={item.name}
                             secondary={`Updated`}
                         />
                         <IconButton

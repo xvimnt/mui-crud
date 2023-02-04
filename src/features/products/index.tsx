@@ -103,7 +103,7 @@ export default function Products() {
         resetStates()
       }
       // Upload the image to S3 and then the item to DynamoDB
-      uploadFileToS3(file, "vsms-products", handleUrl)
+      uploadFileToS3(file, "vsms-products-image", handleUrl)
     }
   }
 
@@ -125,7 +125,7 @@ export default function Products() {
       // Upload the image to S3 and then the item to DynamoDB
       // If the img is the same don't do anything and just call the function above
       if (preview) {
-        uploadFileToS3(file, "vsms-products", handleUrl)
+        uploadFileToS3(file, "vsms-products-image", handleUrl)
       } else {
         handleUrl(item.imageUrl)
       }
