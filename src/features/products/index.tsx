@@ -25,8 +25,8 @@ import Crud from "../../components/Crud";
 export default function Products() {
 
   // Get Rows
-  const rows = useAppSelector(selectProducts);
   const categories = useAppSelector(selectCategories);
+  const rows = useAppSelector(selectProducts);
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(getAllCategories())

@@ -14,9 +14,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import MonitorIcon from '@mui/icons-material/Monitor';
+import { Category, Dashboard, EmojiObjects } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -68,8 +66,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const features = [
-    { label: 'Productos', icon: <MonitorIcon />, path: "/products" },
-    { label: 'Categorias', icon: <MonitorIcon />, path: "/categories" },
+    { label: 'Productos', icon: <EmojiObjects />, path: "/products" },
+    { label: 'Categorias', icon: <Category />, path: "/categories" },
+]
+
+const menus = [
+    { label: 'Dashboard', icon: <Dashboard />, path: "/dashboard" },
 ]
 
 export default function LeftBar() {
@@ -95,34 +97,36 @@ export default function LeftBar() {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                    {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                            <ListItemButton
-                                sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
-                                }}
-                            >
-                                <ListItemIcon
+                    {menus.map((obj, index) => (
+                        <NavLink to={obj.path} key={obj.label} style={{ textDecoration: 'none', color: 'gray' }}>
+                            <ListItem key={obj.label} disablePadding sx={{ display: 'block' }}>
+                                <ListItemButton
                                     sx={{
-                                        minWidth: 0,
-                                        mr: open ? 3 : 'auto',
-                                        justifyContent: 'center',
+                                        minHeight: 48,
+                                        justifyContent: open ? 'initial' : 'center',
+                                        px: 2.5,
                                     }}
                                 >
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                </ListItemIcon>
-                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                            </ListItemButton>
-                        </ListItem>
+                                    <ListItemIcon
+                                        sx={{
+                                            minWidth: 0,
+                                            mr: open ? 3 : 'auto',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        {obj.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={obj.label} sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
+                        </NavLink>
                     ))}
                 </List>
                 <Divider />
                 <List>
                     {features.map((obj, index) => (
-                        <NavLink to={obj.path} key={obj.label} style={{ textDecoration: 'none', color: 'black' }}>
-                            <ListItem disablePadding sx={{ display: 'block'}}>
+                        <NavLink to={obj.path} key={obj.label} style={{ textDecoration: 'none', color: 'gray' }}>
+                            <ListItem disablePadding sx={{ display: 'block' }}>
                                 <ListItemButton
                                     sx={{
                                         minHeight: 48,
