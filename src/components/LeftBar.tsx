@@ -14,7 +14,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Category, Dashboard, EmojiObjects } from '@mui/icons-material';
+import { Category, Dashboard, EmojiObjects, MoneyOffCsredRounded } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -68,6 +68,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const features = [
     { label: 'Productos', icon: <EmojiObjects />, path: "/products" },
     { label: 'Categorias', icon: <Category />, path: "/categories" },
+    { label: 'Ordenes', icon: <MoneyOffCsredRounded />, path: "/orders" },
 ]
 
 const menus = [

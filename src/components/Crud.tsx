@@ -52,7 +52,9 @@ export default function Crud(props: PropsType) {
     return (
         <Box sx={{ width: '100%', height: '100%' }}>
             <Typography variant="h3" gutterBottom>
-                {title}
+                <strong>
+                    {title}
+                </strong>
                 <Button sx={{ marginLeft: 2 }} size="small" variant="contained" onClick={() => setAddOpen(true)}>
                     <AddIcon />
                 </Button>
@@ -63,7 +65,7 @@ export default function Crud(props: PropsType) {
                 setOpen={setConfirmDeleteOpen}
                 onConfirm={deleteItem}
             >
-                Seguro desea eliminar esete elemento?
+                Seguro desea eliminar este elemento?
             </ConfirmDialog>
             <FormDialog title={addTitle} open={addOpen} text="Asegurese de que el codigo sea diferente a alguno ya existente" subscribe={addItem} setClose={closeAdd}>
                 {children}

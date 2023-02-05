@@ -26,15 +26,16 @@ export default function Products() {
 
   // Get Rows
   const categories = useAppSelector(selectCategories);
-  const rows = useAppSelector(selectProducts);
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(getAllCategories())
   }, [dispatch])
+  
+  const rows = useAppSelector(selectProducts);
   useEffect(() => {
     dispatch(getAllProducts())
   }, [dispatch])
-
+  
   // Strings
   const title = "Productos"
   const addTitle = "Agregar Producto"

@@ -29,7 +29,9 @@ export default function Dashboard() {
                 }}
             >
                 <Typography variant="h3" sx={{ marginBottom: 4 }}>
-                    Dashboard
+                    <strong>
+                        Dashboard
+                    </strong>
                 </Typography>
                 <Container maxWidth={false}>
                     <Grid
