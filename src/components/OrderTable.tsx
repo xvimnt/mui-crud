@@ -10,7 +10,9 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Button } from '@mui/material';
 import ConfirmDialog from './ConfimDialog';
-import { OrderItem } from '../features/orders/schema';
+import { Order, OrderItem } from '../features/orders/schema';
+import { updateOrder } from '../features/orders/api';
+import { useAppDispatch } from '../app/hooks';
 
 const TAX_RATE = 0.07;
 
@@ -24,25 +26,29 @@ function subtotal(items: OrderItem[]) {
 
 
 interface PropsType {
-    items: any[],
+    order: Order,
 }
 
 export default function OrderTable(props: PropsType) {
-    const { items } = props
-    const orderSubtotal = subtotal(items)
-    const orderTax = subtotal(items) * TAX_RATE
+    const { order } = props
+    const orderSubtotal = subtotal(order.items)
+    const orderTax = subtotal(order.items) * TAX_RATE
 
     const [ConfirmCancelOpen, setConfirmCancelOpen] = useState(false);
     const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+    const dispatch = useAppDispatch();
 
     const cancelItem = async () => {
-        // await dispatch(deleteProduct(item))
+        const newOrder = { ...order }
+        newOrder.state = 'canceled'
+        await dispatch(updateOrder(newOrder))
         setConfirmCancelOpen(false)
     }
 
-
     const closeItem = async () => {
-        // await dispatch(deleteProduct(item))
+        const newOrder = { ...order }
+        newOrder.state = 'closed'
+        await dispatch(updateOrder(newOrder))
         setConfirmCloseOpen(false)
     }
 
@@ -81,7 +87,7 @@ export default function OrderTable(props: PropsType) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {items.map((item) => (
+                        {order.items.map((item) => (
                             <TableRow key={item.id}>
                                 <TableCell>{item.name}</TableCell>
                                 <TableCell align="right">{item.quantity}</TableCell>

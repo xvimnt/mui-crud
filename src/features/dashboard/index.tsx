@@ -115,7 +115,7 @@ export default function Dashboard() {
                             xl={9}
                             xs={12}
                         >
-                            <VerticalTabs rows={orders.data} title="Ordenes Pendientes" />
+                            <VerticalTabs rows={orders.data.filter(order => order.state === 'pending')} title="Ordenes Pendientes" />
                         </Grid>
                     </Grid>
                 </Container>

@@ -55,7 +55,6 @@ export default function VerticalTabs(props: PropsType) {
   return (
     <Card>
       <CardHeader
-        subtitle={`ordenes in total`}
         title={title}
       />
       <Divider />
@@ -76,10 +75,10 @@ export default function VerticalTabs(props: PropsType) {
             )
           })}
         </Tabs>
-        {rows.map(element => {
+        {rows.map((element, index) => {
           return (
-            <TabPanel key={element.id} value={value} index={element.id}>
-              <OrderTable items={element.items} />
+            <TabPanel key={element.id} value={value} index={index}>
+              <OrderTable order={element} />
             </TabPanel>
           )
         })}

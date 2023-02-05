@@ -27,6 +27,7 @@ export default function Categories() {
   const title = "Categorias"
   const addTitle = "Agregar Nuevo Categoria"
   const editTitle = "Editar Categoria"
+  const text = "Para cambiar el codigo de la categoria debera eliminarla y volverla a crear"
 
   // States 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -142,7 +143,7 @@ export default function Categories() {
   return (
     <>
     <Crud 
-    title={title} rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel} 
+    title={title} rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel} text={text}
     addTitle={addTitle} addOpen={addOpen} addItem={addItem} setAddOpen={setAddOpen} closeAdd={closeAdd}
     editItem={editItem} editOpen={editOpen} editTitle={editTitle} closeEdit={closeEdit}
     deleteItem={deleteItem} confirmDeleteOpen={confirmDeleteOpen} setConfirmDeleteOpen={setConfirmDeleteOpen}>

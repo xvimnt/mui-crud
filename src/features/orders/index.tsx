@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { GridColDef, GridColumnVisibilityModel } from '@mui/x-data-grid';
 import { Alert, Autocomplete, Box, Button, ButtonGroup, Grid, Typography } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
-import { Add, Delete } from "@mui/icons-material";
+import { Add, Delete, RemoveRedEye } from "@mui/icons-material";
 
 // API
 import { getAllOrders, addOrder, deleteOrder, updateOrder } from "./api";
@@ -37,7 +37,7 @@ export default function Orders() {
   // Strings
   const title = "Ordenes"
   const addTitle = "Agregar Orden"
-  const editTitle = "Editar Orden"
+  const text = "Solo se podra modificar el estado de la orden y los articulos cuando esta sigue pendiente"
 
   // States 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -45,6 +45,7 @@ export default function Orders() {
   const [editOpen, setEditOpen] = useState(false);
   const [emptyField, setEmptyField] = useState(false);
   const [quantity, setQuantity] = useState(0);
+  const [editTitle, setEditTitle] = useState("Editar Orden");
   const [selectProductsValue, setSelectProductsValue] = useState('');
   // Item
   const defaultItem: Interface = {
@@ -87,8 +88,11 @@ export default function Orders() {
   }
 
   const editItem = async () => {
+    if(item.state !== 'pending') {
+      setEditOpen(false)
+    }
     // Verifying empty fields
-    if (verifyFields()) {
+    else if (verifyFields()) {
       const date = new Date()
       item.date = date.toLocaleString()
       dispatch(updateOrder(item))
@@ -121,18 +125,26 @@ export default function Orders() {
       flex: 5,
       sortable: false,
       renderCell: (params) => {
+        const order: Interface = params.row
+
         const onClick = (e: any, submitFunction: Function) => {
           e.stopPropagation(); // don't select this row after clicking
+          if(order.state === 'pending') {
+            setEditTitle('Editar Orden')
+          } else {
+            setEditTitle('Ver Orden')
+          }
           // Select the item from the row
-          const Order: Interface = params.row
-          setItem(Order)
+          setItem(order)
           // Do any action
           submitFunction()
         };
 
         return (
           <ButtonGroup variant="contained" aria-label="outlined primary button group">
-            <Button size="small" onClick={(e) => onClick(e, () => setEditOpen(true))}><EditIcon></EditIcon></Button>
+            <Button size="small" onClick={(e) => onClick(e, () => setEditOpen(true))}>
+              {order.state === 'pending' ? <EditIcon /> : <RemoveRedEye />}
+            </Button>
             {/* <Button size="small" onClick={(e) => onClick(e, () => setConfirmDeleteOpen(true))}><DeleteIcon></DeleteIcon></Button> */}
           </ButtonGroup>
         );
@@ -190,30 +202,37 @@ export default function Orders() {
   return (
     <>
       <Crud
-        title={title} rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel}
+        title={title} rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel} text={text}
         addTitle={addTitle} addOpen={addOpen} addItem={addItem} setAddOpen={setAddOpen} closeAdd={closeAdd}
         editItem={editItem} editOpen={editOpen} editTitle={editTitle} closeEdit={closeEdit}
         deleteItem={deleteItem} confirmDeleteOpen={confirmDeleteOpen} setConfirmDeleteOpen={setConfirmDeleteOpen}>
         <form>
           <Grid container sx={{ marginTop: 2 }}>
-            <Grid item md={8} sx={{ padding: 1 }}>
-              <Autocomplete
-                options={products.data}
-                getOptionLabel={(option: Product) => `${option.id} - ${option.name}`}
-                inputValue={selectProductsValue}
-                onInputChange={(event, newInputValue) => {
-                  setSelectProductsValue(newInputValue);
-                }}
-                renderInput={(params) => <TextField {...params} label="Producto" />}
-              />
-            </Grid>
-            <Grid item md={2} sx={{ padding: 1 }}>
-              <TextField type="number" label="Cantidad" value={quantity} onChange={e => setQuantity(Number(e.target.value))}></TextField>
-            </Grid>
-            <Grid item md={2} sx={{ padding: 1 }} >
-              <Button variant="contained" sx={{ height: '100%' }} onClick={addNewOrderItem} ><Add /></Button>
-            </Grid>
-            {emptyField && <Alert severity="error" sx={{ width: '100%' }}>No ha agregado ningun elemento!</Alert>}
+            {
+              (item.state === 'pending') &&
+              (
+                <>
+                  <Grid item md={8} sx={{ padding: 1 }}>
+                    <Autocomplete
+                      options={products.data}
+                      getOptionLabel={(option: Product) => `${option.id} - ${option.name}`}
+                      inputValue={selectProductsValue}
+                      onInputChange={(event, newInputValue) => {
+                        setSelectProductsValue(newInputValue);
+                      }}
+                      renderInput={(params) => <TextField {...params} label="Producto" />}
+                    />
+                  </Grid>
+                  <Grid item md={2} sx={{ padding: 1 }}>
+                    <TextField type="number" label="Cantidad" value={quantity} onChange={e => setQuantity(Number(e.target.value))}></TextField>
+                  </Grid>
+                  <Grid item md={2} sx={{ padding: 1 }} >
+                    <Button variant="contained" sx={{ height: '100%' }} onClick={addNewOrderItem} ><Add /></Button>
+                  </Grid>
+                  {emptyField && <Alert severity="error" sx={{ width: '100%' }}>No ha agregado ningun elemento!</Alert>}
+                </>
+              )
+            }
             <Grid container spacing={3}>
               {item.items?.map((item: any) => (
                 <Grid item key={item.name} xs={12} sm={12} md={6}>
@@ -238,7 +257,10 @@ export default function Orders() {
                       <Typography variant="subtitle2">
                         {`Precio Unitario: Q.${item.price}`}
                       </Typography>
-                      <Button variant="outlined" color="error" size="small" onClick={() => removeOrderItem(item.name)}><Delete /></Button>
+                      {
+                        (item.state === 'pending') &&
+                        <Button variant="outlined" color="error" size="small" onClick={() => removeOrderItem(item.name)}><Delete /></Button>
+                      }
                     </Box>
                   </center>
                 </Grid>

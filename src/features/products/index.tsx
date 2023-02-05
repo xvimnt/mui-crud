@@ -40,6 +40,7 @@ export default function Products() {
   const title = "Productos"
   const addTitle = "Agregar Producto"
   const editTitle = "Editar Producto"
+  const text = "Para cambiar el codigo del producto debera eliminarlo y volverlo a crear"
 
   // States 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -190,7 +191,7 @@ export default function Products() {
 
   return (
     <Crud 
-    title={title} rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel} 
+    title={title} rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel} text={text}
     addTitle={addTitle} addOpen={addOpen} addItem={addItem} setAddOpen={setAddOpen} closeAdd={closeAdd}
     editItem={editItem} editOpen={editOpen} editTitle={editTitle} closeEdit={closeEdit}
     deleteItem={deleteItem} confirmDeleteOpen={confirmDeleteOpen} setConfirmDeleteOpen={setConfirmDeleteOpen}>

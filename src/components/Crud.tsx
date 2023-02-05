@@ -26,6 +26,7 @@ interface PropsType {
     confirmDeleteOpen: any,
     setConfirmDeleteOpen: any,
     deleteItem: any,
+    text: string,
 }
 
 export default function Crud(props: PropsType) {
@@ -46,7 +47,8 @@ export default function Crud(props: PropsType) {
         editItem,
         confirmDeleteOpen,
         setConfirmDeleteOpen,
-        deleteItem
+        deleteItem,
+        text
     } = props;
 
     return (
@@ -70,7 +72,7 @@ export default function Crud(props: PropsType) {
             <FormDialog title={addTitle} open={addOpen} text="Asegurese de que el codigo sea diferente a alguno ya existente" subscribe={addItem} setClose={closeAdd}>
                 {children}
             </FormDialog>
-            <FormDialog title={editTitle} open={editOpen} text="Para cambiar el codigo debera eliminar y volver a crear" subscribe={editItem} setClose={closeEdit}>
+            <FormDialog title={editTitle} open={editOpen} text={text} subscribe={editItem} setClose={closeEdit}>
                 {children}
             </FormDialog>
             {rows.fetchStatus === "error" && <Alert severity="error">Ocurrio un error al obtener los datos!</Alert>}
