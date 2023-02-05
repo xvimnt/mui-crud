@@ -39,7 +39,13 @@ function a11yProps(index: number) {
   };
 }
 
-export default function VerticalTabs() {
+interface PropsType {
+  rows: any[],
+  title: string,
+}
+
+export default function VerticalTabs(props: PropsType) {
+  const { title, rows } = props
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -50,7 +56,7 @@ export default function VerticalTabs() {
     <Card>
       <CardHeader
         subtitle={`ordenes in total`}
-        title="Ordenes Pendientes"
+        title={title}
       />
       <Divider />
       <Box
@@ -64,35 +70,19 @@ export default function VerticalTabs() {
           aria-label="Vertical tabs example"
           sx={{ borderRight: 1, borderColor: 'divider' }}
         >
-          <Tab label="Orden 234" {...a11yProps(0)} />
-          <Tab label="Orden 321" {...a11yProps(1)} />
-          <Tab label="Orden 543" {...a11yProps(2)} />
-          <Tab label="Orden 543" {...a11yProps(3)} />
-          <Tab label="Orden 453" {...a11yProps(4)} />
-          <Tab label="Orden 324" {...a11yProps(5)} />
-          <Tab label="Orden 543" {...a11yProps(6)} />
+          {rows.map(element => {
+            return (
+              <Tab key={element.id} label={`Orden ${element.id}`} {...a11yProps(element.id)} />
+            )
+          })}
         </Tabs>
-        <TabPanel value={value} index={0}>
-          <OrderTable />
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <OrderTable />
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-          Orden Three
-        </TabPanel>
-        <TabPanel value={value} index={3}>
-          Orden Four
-        </TabPanel>
-        <TabPanel value={value} index={4}>
-          Orden Five
-        </TabPanel>
-        <TabPanel value={value} index={5}>
-          Orden Six
-        </TabPanel>
-        <TabPanel value={value} index={6}>
-          Orden Seven
-        </TabPanel>
+        {rows.map(element => {
+          return (
+            <TabPanel key={element.id} value={value} index={element.id}>
+              <OrderTable items={element.items} />
+            </TabPanel>
+          )
+        })}
       </Box>
     </Card>
   );

@@ -1,25 +1,36 @@
-import InfoCard from "../../components/InfoCard";
+import { useEffect } from "react";
 // Mui
 import { Container, Grid, Box, Typography, LinearProgress } from "@mui/material";
 // Icons
 import { Money, Person, ArrowDownward, ArrowUpward, InsertChart, AttachMoney } from "@mui/icons-material";
+// Components
+import InfoCard from "../../components/InfoCard";
 import { BarChart } from "../../components/BarChart";
 import { PieChart } from "../../components/PieChart";
 import { InfoTable } from "../../components/InfoTable";
-import { useEffect } from "react";
+import VerticalTabs from "../../components/VerticalTabs";
+
+// Redux
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { selectProducts } from "../products/slice";
 import { getAllProducts } from "../products/api";
-import VerticalTabs  from "../../components/VerticalTabs";
+import { getAllOrders } from "../orders/api";
+import { selectOrders } from "../orders/slice";
 
 export default function Dashboard() {
-    
-  const products = useAppSelector(selectProducts);
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    dispatch(getAllProducts())
-  }, [dispatch])
-  
+
+    const products = useAppSelector(selectProducts);
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        dispatch(getAllProducts())
+    }, [dispatch])
+
+    // Get Rows
+    const orders = useAppSelector(selectOrders);
+    useEffect(() => {
+        dispatch(getAllOrders())
+    }, [dispatch])
+
     return (
         <>
             <Box
@@ -95,7 +106,7 @@ export default function Dashboard() {
                             xl={3}
                             xs={12}
                         >
-                            <InfoTable rows={products.data} title="Mas Vendidos"/>
+                            <InfoTable rows={products.data} title="Mas Vendidos" />
                         </Grid>
                         <Grid
                             item
@@ -104,7 +115,7 @@ export default function Dashboard() {
                             xl={9}
                             xs={12}
                         >
-                            <VerticalTabs />
+                            <VerticalTabs rows={orders.data} title="Ordenes Pendientes" />
                         </Grid>
                     </Grid>
                 </Container>
