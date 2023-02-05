@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 // MUI
 import TextField from '@mui/material/TextField';
 import { GridColDef, GridColumnVisibilityModel } from '@mui/x-data-grid';
-import { Autocomplete, Box, Button, ButtonGroup, Grid, Typography } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, ButtonGroup, Grid, Typography } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import { Add, Delete } from "@mui/icons-material";
 
@@ -43,9 +43,9 @@ export default function Orders() {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [, setEmptyField] = useState(false);
+  const [emptyField, setEmptyField] = useState(false);
   const [quantity, setQuantity] = useState(0);
-  const [inputValue, setInputValue] = useState('');
+  const [selectProductsValue, setSelectProductsValue] = useState('');
   // Item
   const defaultItem: Interface = {
     id: 0,
@@ -64,16 +64,9 @@ export default function Orders() {
 
   const verifyFields = () => {
     setEmptyField(false)
-
     // Verify if required fields are valid
-    if (item.id > 0 && item.date && item.state) {
-      // Edit doesn't need to compare codes
-      if (editOpen) return true
-      // Look for existing code
-      const index = rows.data.findIndex((e) => e.id === item.id);
-      if (index === -1) {
-        return true
-      }
+    if (item.items.length > 0) {
+      return true
     }
     else {
       setEmptyField(true)
@@ -84,6 +77,10 @@ export default function Orders() {
   const addItem = async () => {
     // Verifying empty fields
     if (verifyFields()) {
+      const date = new Date()
+      item.date = date.toLocaleString()
+      item.id = Date.now()
+
       dispatch(addOrder(item))
       resetStates()
     }
@@ -92,6 +89,8 @@ export default function Orders() {
   const editItem = async () => {
     // Verifying empty fields
     if (verifyFields()) {
+      const date = new Date()
+      item.date = date.toLocaleString()
       dispatch(updateOrder(item))
       resetStates()
       setEditOpen(false)
@@ -134,6 +133,7 @@ export default function Orders() {
         return (
           <ButtonGroup variant="contained" aria-label="outlined primary button group">
             <Button size="small" onClick={(e) => onClick(e, () => setEditOpen(true))}><EditIcon></EditIcon></Button>
+            {/* <Button size="small" onClick={(e) => onClick(e, () => setConfirmDeleteOpen(true))}><DeleteIcon></DeleteIcon></Button> */}
           </ButtonGroup>
         );
       }
@@ -149,15 +149,16 @@ export default function Orders() {
   }
 
   // Add new Item
-  const addNewItem = () => {
+  const addNewOrderItem = () => {
+    if (quantity <= 0) return
     // Obtaining the id from the select label
-    const id =  Number(inputValue.split('-')[0].trim())
+    const id = Number(selectProductsValue.split('-')[0].trim())
     const product = products.data.find(e => e.id === id)
-    if(product) {
+    if (product) {
       const existProduct = item.items.find(e => e.id === id)
-      if(existProduct) {
+      if (existProduct) {
         // Updating quantity
-        const newItem = {...existProduct}
+        const newItem: OrderItem = { ...existProduct }
         newItem.quantity += quantity
         let newItems = [...item.items]
         // Removing and ading the updated item
@@ -167,9 +168,9 @@ export default function Orders() {
       }
       else {
         // Creating a new Order Item and adding to the Order
-        const newItem = {
-          id:  id,
-          name:  product.name,
+        const newItem: OrderItem = {
+          id: id,
+          name: product.name,
           imageUrl: product.imageUrl,
           quantity: quantity,
           price: product.price,
@@ -180,10 +181,10 @@ export default function Orders() {
     }
   }
 
-  const removeItem = (name: string) => {
+  const removeOrderItem = (name: string) => {
     let newItems = [...item.items]
     newItems = newItems.filter(el => el.name !== name)
-    setItem({...item, items: newItems})
+    setItem({ ...item, items: newItems })
   }
 
   return (
@@ -199,9 +200,9 @@ export default function Orders() {
               <Autocomplete
                 options={products.data}
                 getOptionLabel={(option: Product) => `${option.id} - ${option.name}`}
-                inputValue={inputValue}
+                inputValue={selectProductsValue}
                 onInputChange={(event, newInputValue) => {
-                  setInputValue(newInputValue);
+                  setSelectProductsValue(newInputValue);
                 }}
                 renderInput={(params) => <TextField {...params} label="Producto" />}
               />
@@ -210,8 +211,9 @@ export default function Orders() {
               <TextField type="number" label="Cantidad" value={quantity} onChange={e => setQuantity(Number(e.target.value))}></TextField>
             </Grid>
             <Grid item md={2} sx={{ padding: 1 }} >
-              <Button variant="contained" sx={{ height: '100%' }} onClick={addNewItem} ><Add /></Button>
+              <Button variant="contained" sx={{ height: '100%' }} onClick={addNewOrderItem} ><Add /></Button>
             </Grid>
+            {emptyField && <Alert severity="error" sx={{ width: '100%' }}>No ha agregado ningun elemento!</Alert>}
             <Grid container spacing={3}>
               {item.items?.map((item: any) => (
                 <Grid item key={item.name} xs={12} sm={12} md={6}>
@@ -236,7 +238,7 @@ export default function Orders() {
                       <Typography variant="subtitle2">
                         {`Precio Unitario: Q.${item.price}`}
                       </Typography>
-                      <Button variant="outlined" color="error" size="small" onClick={() => removeItem(item.name)}><Delete /></Button>
+                      <Button variant="outlined" color="error" size="small" onClick={() => removeOrderItem(item.name)}><Delete /></Button>
                     </Box>
                   </center>
                 </Grid>

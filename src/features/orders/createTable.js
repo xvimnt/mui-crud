@@ -40,12 +40,14 @@ dynamodb.createTable(params, function (err, data) {
       state: 'pending',
       items: [
         {
+          id: 0,
           name: 'Surgeon Robot',
           quantity: 30,
           price: 120,
           imageUrl: "https://github.com/ebenezerdon/shopping-cart-images/blob/main/robot1.png?raw=true"
         },
         {
+          id: 1,
           name: 'Main Robot',
           quantity: 20,
           price: 220,

@@ -9,6 +9,7 @@ interface PropsType {
 export default function Table(props: PropsType) {
   const { rows, columns, columnVisibilityModel } = props
   return (
+    rows && (
     <div style={{ height: 420, width: '100%' }}>
       <DataGrid
         rows={rows}
@@ -17,6 +18,6 @@ export default function Table(props: PropsType) {
         rowsPerPageOptions={[6]}
         columnVisibilityModel={columnVisibilityModel}
       />
-    </div>
+    </div> )
   );
 }
