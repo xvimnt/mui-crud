@@ -18,93 +18,127 @@ import { ButtonGroup } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        MilkyWare
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
+    return (
+        <Typography variant="body2" color="text.secondary" align="center" {...props}>
+            {'Copyright © '}
+            <Link color="inherit" href="https://mui.com/">
+                MilkyWare
+            </Link>{' '}
+            {new Date().getFullYear()}
+            {'.'}
+        </Typography>
+    );
 }
 
 const theme = createTheme();
 
 export default function ForgotPassword() {
 
-  const [email, setEmail] = useState('')
-  const user = useAppSelector(selectUser);
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+    const [email, setEmail] = useState('')
+    const [isSent, setIsSent] = useState(false)
+    const user = useAppSelector(selectUser);
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
-  useEffect(() => {
-    // redirect authenticated user to profile screen
-    if (user.email_verified) navigate('/dashboard')
-  }, [navigate, user])
+    useEffect(() => {
+        // redirect authenticated user to profile screen
+        if (user.email_verified) navigate('/dashboard')
+    }, [navigate, user])
 
-  async function forgotPassword() {
-    try {
-      await Auth.forgotPassword(email);
-    } catch (error) {
-      console.error(error)
+    async function forgotPassword() {
+        try {
+            // await Auth.forgotPassword(email);
+            setIsSent(true)
+        } catch (error) {
+            console.error(error)
+        }
     }
-  }
 
-  return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Verificacion de Email
-          </Typography>
-          <Box component="form" noValidate sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Codigo de Verificacion"
-                  name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Grid>
-            </Grid>
-            <ButtonGroup sx={{ mt: 3, mb: 2 }}>
-              <Button
-                fullWidth
-                variant="contained"
-                color='success'
-                onClick={forgotPassword}
-              >
-                Confirmar
-              </Button>
-            </ButtonGroup>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="/" variant="body2">
-                  Ya tienes cuenta? Entra aqui
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-        <Copyright sx={{ mt: 5 }} />
-      </Container>
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider theme={theme}>
+            <Container component="main" maxWidth="xs">
+                <CssBaseline />
+                <Box
+                    sx={{
+                        marginTop: 8,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                        <LockOutlinedIcon />
+                    </Avatar>
+                    <Typography component="h1" variant="h5">
+                        Reiniciar Password
+                    </Typography>
+                    <Box component="form" noValidate sx={{ mt: 3 }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                {!isSent && (<TextField
+                                    required
+                                    fullWidth
+                                    id="email"
+                                    label="Email"
+                                    name="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />)}
+                            </Grid>
+                            {isSent && (
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="code"
+                                        label="Codigo de Verificacion"
+                                        name="code"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="password"
+                                        id="password"
+                                        label="Contrasena"
+                                        name="password"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="verifyPassword"
+                                        id="verifyPassword"
+                                        label="Verifica Contrasena"
+                                        name="verifyPassword"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                </Grid>
+                            )}
+                        </Grid>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color='success'
+                            onClick={!isSent ? forgotPassword : forgotPassword}
+                            sx={{ marginY: 2 }}
+                        >
+                            Confirmar
+                        </Button>
+                        <Grid container justifyContent="flex-end">
+                            <Grid item>
+                                <Link href="/" variant="body2">
+                                    Ya tienes cuenta? Entra aqui
+                                </Link>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
+                <Copyright sx={{ mt: 5 }} />
+            </Container>
+        </ThemeProvider>
+    );
 }

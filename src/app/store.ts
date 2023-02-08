@@ -1,5 +1,14 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist'
+import { 
+  persistStore, 
+  persistReducer,  
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER
+ } from 'redux-persist'
 import productReducer from '../features/products/slice';
 import CategoryReducer from '../features/categories/slice';
 import OrderReducer from '../features/orders/slice';
@@ -10,7 +19,7 @@ const persistConfig = {
   key: 'root',
   storage,
 }
- 
+
 const persistedUserReducer = persistReducer(persistConfig, userReducer)
 
 export const store = configureStore({
@@ -20,6 +29,12 @@ export const store = configureStore({
     orders: OrderReducer,
     user: persistedUserReducer,
   },
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
 
 // Enhanced store

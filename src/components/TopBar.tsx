@@ -8,7 +8,6 @@ import { Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import { AccountCircle } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../features/user/slice';
 
 const drawerWidth = 240;
@@ -49,7 +48,6 @@ export default function TopBar(props: any) {
     };
 
     const dispatch = useDispatch()
-    const navigate = useNavigate()
 
     const logout = async () => {
         try {
