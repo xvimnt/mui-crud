@@ -4,7 +4,7 @@ window.env = {
   "AMDRMSDKPATH": "C:\\Program Files\\AMD\\RyzenMasterSDK\\",
   "API_URL": "https://dfemzeqgo0.execute-api.us-east-1.amazonaws.com",
   "APPDATA": "C:\\Users\\matri\\AppData\\Roaming",
-  "CHROME_CRASHPAD_PIPE_NAME": "\\\\.\\pipe\\LOCAL\\crashpad_6180_KOWVISAEOYBJCZSH",
+  "CHROME_CRASHPAD_PIPE_NAME": "\\\\.\\pipe\\LOCAL\\crashpad_20264_CFCFYONIKZPYHGSV",
   "COLOR": "1",
   "COLORTERM": "truecolor",
   "CommonProgramFiles": "C:\\Program Files\\Common Files",

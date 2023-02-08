@@ -24,7 +24,10 @@ export const userSlice = createSlice({
             state.jwt = action.payload.jwt
         },
         logoutUser: (state) => {
-            state = initialState
+            state.email = initialState.email
+            state.username = initialState.username
+            state.email_verified = initialState.email_verified
+            state.jwt = initialState.jwt
         },
     },
 })

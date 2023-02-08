@@ -32,9 +32,9 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
-export default function Verify() {
+export default function ForgotPassword() {
 
-  const [code, setCode] = useState('')
+  const [email, setEmail] = useState('')
   const user = useAppSelector(selectUser);
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -44,18 +44,9 @@ export default function Verify() {
     if (user.email_verified) navigate('/dashboard')
   }, [navigate, user])
 
-  async function resendConfirmationCode() {
+  async function forgotPassword() {
     try {
-      await Auth.resendSignUp(user.email);
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  async function verify() {
-    try {
-      await Auth.confirmSignUp(user.email, code);
-      dispatch(confirmUser())
+      await Auth.forgotPassword(email);
     } catch (error) {
       console.error(error)
     }
@@ -85,11 +76,11 @@ export default function Verify() {
                 <TextField
                   required
                   fullWidth
-                  id="code"
+                  id="email"
                   label="Codigo de Verificacion"
-                  name="code"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </Grid>
             </Grid>
@@ -97,15 +88,8 @@ export default function Verify() {
               <Button
                 fullWidth
                 variant="contained"
-                onClick={resendConfirmationCode}
-              >
-                Reenviar Codigo
-              </Button>
-              <Button
-                fullWidth
-                variant="contained"
                 color='success'
-                onClick={verify}
+                onClick={forgotPassword}
               >
                 Confirmar
               </Button>
