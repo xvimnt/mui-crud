@@ -16,7 +16,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 // Amplify Auth
 import { Auth } from 'aws-amplify';
 import { loginUser, selectUser } from './slice';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
