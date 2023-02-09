@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -18,6 +18,7 @@ import { Auth } from 'aws-amplify';
 import { loginUser, selectUser } from './slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Alert } from '@mui/material';
 
 function Copyright(props: any) {
   return (
@@ -35,11 +36,11 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function SignIn() {
-  
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
   var user = useSelector(selectUser)
-  
+
   useEffect(() => {
     // redirect authenticated user to profile screen
     if (user.email_verified) navigate('/dashboard')
@@ -49,9 +50,10 @@ export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emptyField, setEmptyField] = useState(false);
+  const [error, setError] = useState(false);
 
   const login = async () => {
-    if(verifyFields()) {
+    if (verifyFields()) {
       try {
         const user = await Auth.signIn(email, password);
         const newUser = {
@@ -62,15 +64,16 @@ export default function SignIn() {
         }
         dispatch(loginUser(newUser))
       } catch (error) {
-        console.error(error)
+        setError(true)
       }
     }
   };
 
   const verifyFields = () => {
+    setError(false)
     setEmptyField(false)
     // Verify if required fields are valid
-    if (email && password ) {
+    if (email && password) {
       return true
     }
     else {
@@ -144,6 +147,7 @@ export default function SignIn() {
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
               />
+              {error && <Alert severity="error">Credenciales incorrectas!</Alert>}
               <Button
                 fullWidth
                 variant="contained"

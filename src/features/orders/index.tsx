@@ -151,7 +151,7 @@ export default function Orders() {
       }
     },
     { field: 'id', headerName: 'ID', flex: 2, type: 'number' },
-    { field: 'date', headerName: 'Fecha', flex: 10 },
+    { field: 'date', headerName: 'Fecha', flex: 10, type: 'date' },
     { field: 'state', headerName: 'Estado', flex: 10 },
 
   ];

@@ -11,11 +11,10 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { Auth } from 'aws-amplify';
-import { selectUser, confirmUser } from './slice';
+import { selectUser } from './slice';
 import { useAppSelector } from '../../app/hooks';
-import { useDispatch } from 'react-redux';
-import { ButtonGroup } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Alert } from '@mui/material';
 
 function Copyright(props: any) {
     return (
@@ -40,9 +39,9 @@ export default function ForgotPassword() {
     const [verifyPassword, setVerifyPassword] = useState('')
     const [emptyField, setEmptyField] = useState(false);
     const [isSent, setIsSent] = useState(false)
+    const [error, setError] = useState(false);
 
     const user = useAppSelector(selectUser);
-    const dispatch = useDispatch()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -55,7 +54,7 @@ export default function ForgotPassword() {
             await Auth.forgotPassword(email);
             setIsSent(true)
         } catch (error) {
-            console.error(error)
+            setError(true)
         }
     }
 
@@ -66,12 +65,13 @@ export default function ForgotPassword() {
                 await Auth.forgotPasswordSubmit(email, code, password);
                 navigate('/')
             } catch (error) {
-                console.error(error)
+                setError(true)
             }
         }
     }
 
     const verifyFields = () => {
+        setError(false)
         setEmptyField(false)
         // Verify if required fields are valid
         if (email && password && (password === verifyPassword) && code) {
@@ -159,6 +159,7 @@ export default function ForgotPassword() {
                                 </>
                             )}
                         </Grid>
+                        {error && <Alert sx={{marginTop: 1}} severity="error">Credenciales incorrectas!</Alert>}
                         <Button
                             fullWidth
                             variant="contained"
