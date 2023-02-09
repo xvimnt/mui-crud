@@ -35,6 +35,7 @@ export default function SignUp() {
   var user = useSelector(selectUser)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [verifyPassword, setVerifyPassword] = useState('')
   const [nickname, setNickname] = useState('')
   const [emptyField, setEmptyField] = useState(false);
 
@@ -49,9 +50,9 @@ export default function SignUp() {
   }, [navigate, user])
 
   async function signUp() {
-    if(verifyFields()) {
+    if (verifyFields()) {
       const username = email
-        try {
+      try {
         await Auth.signUp({
           username,
           password,
@@ -79,7 +80,7 @@ export default function SignUp() {
   const verifyFields = () => {
     setEmptyField(false)
     // Verify if required fields are valid
-    if (email && password && nickname) {
+    if (email && password && (password === verifyPassword) && nickname) {
       return true
     }
     else {
@@ -100,7 +101,7 @@ export default function SignUp() {
             flexDirection: 'column',
             alignItems: 'center',
           }}
-          >
+        >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
@@ -146,7 +147,20 @@ export default function SignUp() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
-                  error={emptyField && !password}
+                  error={emptyField && (!password || (password !== verifyPassword))}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  type="password"
+                  id="verifyPassword"
+                  label="Verifica Contrasena"
+                  name="verifyPassword"
+                  error={emptyField && (!verifyPassword || (password !== verifyPassword))}
+                  value={verifyPassword}
+                  onChange={(e) => setVerifyPassword(e.target.value)}
                 />
               </Grid>
             </Grid>

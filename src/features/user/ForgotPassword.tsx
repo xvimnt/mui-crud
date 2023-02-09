@@ -116,43 +116,47 @@ export default function ForgotPassword() {
                                 />)}
                             </Grid>
                             {isSent && (
-                                <Grid item xs={12}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="code"
-                                        label="Codigo de Verificacion"
-                                        name="code"
-                                        error={emptyField && !code}
-                                        value={code}
-                                        onChange={(e) => setCode(e.target.value)}
-                                        sx={{ marginY: 1 }}
-                                    />
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        type="password"
-                                        id="password"
-                                        label="Contrasena"
-                                        name="password"
-                                        error={emptyField && ( !password || (password !== verifyPassword) )} 
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        sx={{ marginY: 1 }}
-                                    />
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        type="password"
-                                        id="verifyPassword"
-                                        label="Verifica Contrasena"
-                                        name="verifyPassword"
-                                        error={emptyField &&  ( !verifyPassword || (password !== verifyPassword) )}
-                                        value={verifyPassword}
-                                        onChange={(e) => setVerifyPassword(e.target.value)}
-                                        sx={{ marginY: 1 }}
-                                    />
-                                </Grid>
+                                <>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            id="code"
+                                            label="Codigo de Verificacion"
+                                            name="code"
+                                            error={emptyField && !code}
+                                            value={code}
+                                            onChange={(e) => setCode(e.target.value)}
+                                            sx={{ marginY: 1 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            type="password"
+                                            id="password"
+                                            label="Contrasena"
+                                            name="password"
+                                            error={emptyField && (!password || (password !== verifyPassword))}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            type="password"
+                                            id="verifyPassword"
+                                            label="Verifica Contrasena"
+                                            name="verifyPassword"
+                                            error={emptyField && (!verifyPassword || (password !== verifyPassword))}
+                                            value={verifyPassword}
+                                            onChange={(e) => setVerifyPassword(e.target.value)}
+                                        />
+                                    </Grid>
+                                </>
                             )}
                         </Grid>
                         <Button
