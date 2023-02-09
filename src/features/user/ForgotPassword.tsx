@@ -35,7 +35,12 @@ const theme = createTheme();
 export default function ForgotPassword() {
 
     const [email, setEmail] = useState('')
+    const [code, setCode] = useState('')
+    const [password, setPassword] = useState('')
+    const [verifyPassword, setVerifyPassword] = useState('')
+    const [emptyField, setEmptyField] = useState(false);
     const [isSent, setIsSent] = useState(false)
+
     const user = useAppSelector(selectUser);
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -47,12 +52,37 @@ export default function ForgotPassword() {
 
     async function forgotPassword() {
         try {
-            // await Auth.forgotPassword(email);
+            await Auth.forgotPassword(email);
             setIsSent(true)
         } catch (error) {
             console.error(error)
         }
     }
+
+
+    async function changePassword() {
+        if (verifyFields()) {
+            try {
+                await Auth.forgotPasswordSubmit(email, code, password);
+                navigate('/')
+            } catch (error) {
+                console.error(error)
+            }
+        }
+    }
+
+    const verifyFields = () => {
+        setEmptyField(false)
+        // Verify if required fields are valid
+        if (email && password && (password === verifyPassword) && code) {
+            return true
+        }
+        else {
+            setEmptyField(true)
+        }
+        return false
+    }
+
 
     return (
         <ThemeProvider theme={theme}>
@@ -93,8 +123,10 @@ export default function ForgotPassword() {
                                         id="code"
                                         label="Codigo de Verificacion"
                                         name="code"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        error={emptyField && !code}
+                                        value={code}
+                                        onChange={(e) => setCode(e.target.value)}
+                                        sx={{ marginY: 1 }}
                                     />
                                     <TextField
                                         required
@@ -103,18 +135,22 @@ export default function ForgotPassword() {
                                         id="password"
                                         label="Contrasena"
                                         name="password"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        error={emptyField && ( !password || (password !== verifyPassword) )} 
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        sx={{ marginY: 1 }}
                                     />
                                     <TextField
                                         required
                                         fullWidth
-                                        type="verifyPassword"
+                                        type="password"
                                         id="verifyPassword"
                                         label="Verifica Contrasena"
                                         name="verifyPassword"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        error={emptyField &&  ( !verifyPassword || (password !== verifyPassword) )}
+                                        value={verifyPassword}
+                                        onChange={(e) => setVerifyPassword(e.target.value)}
+                                        sx={{ marginY: 1 }}
                                     />
                                 </Grid>
                             )}
@@ -123,7 +159,7 @@ export default function ForgotPassword() {
                             fullWidth
                             variant="contained"
                             color='success'
-                            onClick={!isSent ? forgotPassword : forgotPassword}
+                            onClick={!isSent ? forgotPassword : changePassword}
                             sx={{ marginY: 2 }}
                         >
                             Confirmar
