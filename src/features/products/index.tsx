@@ -21,20 +21,22 @@ import { getAllCategories } from "../categories/api";
 // Services
 import uploadFileToS3 from '../../services/uploadFileToS3'
 import Crud from "../../components/Crud";
+import { selectUser } from "../user/slice";
 
 export default function Products() {
+  const user = useAppSelector(selectUser);
 
   // Get Rows
   const categories = useAppSelector(selectCategories);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(getAllCategories())
-  }, [dispatch])
+    dispatch(getAllCategories(user.sub))
+  }, [dispatch, user.sub])
   
   const rows = useAppSelector(selectProducts);
   useEffect(() => {
-    dispatch(getAllProducts())
-  }, [dispatch])
+    dispatch(getAllProducts(user.sub))
+  }, [dispatch, user.sub])
   
   // Strings
   const title = "Productos"
@@ -60,6 +62,7 @@ export default function Products() {
     imageUrl: '',
     price: 0,
     stock: 0,
+    sub: user.sub,
   }
   const [item, setItem] = useState<Interface>(defaultItem)
 

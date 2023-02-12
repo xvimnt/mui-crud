@@ -15,9 +15,24 @@ var params = {
   KeySchema: [
     // Partition Key
     { AttributeName: "id", KeyType: "HASH" },
+    // Sort Keys
+    { AttributeName: "sub", KeyType: "RANGE" }
   ],
   AttributeDefinitions: [
     { AttributeName: "id", AttributeType: "N" },
+    { AttributeName: "sub", AttributeType: "S" },
+  ],
+  LocalSecondaryIndexes: [
+    {
+      IndexName: "ClientIndex",
+      KeySchema: [
+        { AttributeName: "id", KeyType: "HASH" },
+        { AttributeName: "sub", KeyType: "RANGE" }
+      ],
+      Projection: {
+        ProjectionType: "KEYS_ONLY"
+      }
+    },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 10,
@@ -38,6 +53,9 @@ dynamodb.createTable(params, function (err, data) {
       id: 0,
       date: '2022-05-13',
       state: 'pending',
+      sub: '1',
+      client_email: 'example',
+      client_name: 'example',
       items: [
         {
           id: 0,

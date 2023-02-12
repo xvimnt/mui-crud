@@ -61,6 +61,7 @@ export default function SignIn() {
           username: user.username,
           email_verified: user.attributes.email_verified,
           jwt: user.signInUserSession.accessToken.jwtToken,
+          sub: user.attributes.sub,
         }
         dispatch(loginUser(newUser))
       } catch (error) {

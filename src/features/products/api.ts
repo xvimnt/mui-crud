@@ -11,11 +11,11 @@ const table_name = "products"
 // will call the thunk with the `dispatch` function as the first argument. Async
 // code can then be executed and other actions can be dispatched. Thunks are
 // typically used to make async requests.
-export const getAllProducts = createAsyncThunk(`get-all-${table_name}`, async () => {
+export const getAllProducts = createAsyncThunk(`get-all-${table_name}`, async (sub:string) => {
     try {
 
         const response = await axios({
-            url: `/${table_name}`,
+            url: `/${table_name}/${sub}`,
             baseURL: env.API_URL,
             method: "get",
             headers: {
@@ -67,6 +67,7 @@ export const deleteProduct = createAsyncThunk(`delete-${table_name}`, async (ite
         url: `/${table_name}/${item.id}`,
         baseURL: env.API_URL,
         method: "delete",
+        data: item,
         headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',

@@ -15,10 +15,10 @@ AWS.config.update({
 
 Amplify.configure({
   Auth: {
-    identityPoolId: 'us-east-1:a2eafb8f-2ffc-437a-a7c6-d344fa2d7b07',
-    region: "us-east-1",
-    userPoolId: "us-east-1_ocHYKrTh4", // Please change this value.
-    userPoolWebClientId: "72g04gbdb9abitaekb8rui3ll4", // Please change this value.
+    identityPoolId: env.IDENTITY_POOL_ID,
+    region: env.REGION,
+    userPoolId: env.USER_POOL_ID, 
+    userPoolWebClientId: env.USER_POOL_WEB_CLIENT_ID, 
   },
 });
 

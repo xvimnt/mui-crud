@@ -16,20 +16,22 @@ import { selectProducts } from "../products/slice";
 import { getAllProducts } from "../products/api";
 import { getAllOrders } from "../orders/api";
 import { selectOrders } from "../orders/slice";
+import { selectUser } from "../user/slice";
 
 export default function Dashboard() {
+    const user = useAppSelector(selectUser);
 
     const products = useAppSelector(selectProducts);
     const dispatch = useAppDispatch();
     useEffect(() => {
-        dispatch(getAllProducts())
-    }, [dispatch])
+        dispatch(getAllProducts(user.sub))
+    }, [dispatch, user.sub])
 
     // Get Rows
     const orders = useAppSelector(selectOrders);
     useEffect(() => {
-        dispatch(getAllOrders())
-    }, [dispatch])
+        dispatch(getAllOrders(user.sub))
+    }, [dispatch, user.sub])
 
     return (
         <>

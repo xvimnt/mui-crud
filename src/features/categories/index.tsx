@@ -13,16 +13,18 @@ import { selectCategories } from "./slice";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Category as Interface } from "./schema";
 import Crud from "../../components/Crud";
+import { selectUser } from "../user/slice";
 
 export default function Categories() {
+  const user = useAppSelector(selectUser);
 
   // Get Rows
   const dispatch = useAppDispatch();
   const rows = useAppSelector(selectCategories);
   useEffect(() => {
-    dispatch(getAllCategories())
-  }, [dispatch])
-
+    dispatch(getAllCategories(user.sub))
+  }, [dispatch, user.sub])
+  
   // Strings
   const title = "Categorias"
   const addTitle = "Agregar Nuevo Categoria"
@@ -35,12 +37,13 @@ export default function Categories() {
   const [editOpen, setEditOpen] = useState(false);
   const [emptyField, setEmptyField] = useState(false);
   const [duplicatedCode, setDuplicatedCode] = useState(false);
-
+  
   // Item
   const defaultItem: Interface = {
     id: 0,
     name: '',
     detail: '',
+    sub: user.sub,
   }
   const [item, setItem] = useState<Interface>(defaultItem)
 

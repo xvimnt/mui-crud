@@ -18,21 +18,22 @@ import Crud from "../../components/Crud";
 import { getAllProducts } from "../products/api";
 import { selectProducts } from "../products/slice";
 import { Product } from "../products/schema";
+import { selectUser } from "../user/slice";
 
 export default function Orders() {
+  const user = useAppSelector(selectUser);
 
   // Get Rows
   const rows = useAppSelector(selectOrders);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(getAllOrders())
-  }, [dispatch])
+    dispatch(getAllOrders(user.sub))
+  }, [dispatch, user.sub])
 
   const products = useAppSelector(selectProducts);
   useEffect(() => {
-    dispatch(getAllProducts())
-  }, [dispatch])
-
+    dispatch(getAllProducts(user.sub))
+  }, [dispatch, user.sub])
 
   // Strings
   const title = "Ordenes"
@@ -52,6 +53,9 @@ export default function Orders() {
     id: 0,
     date: '',
     state: 'pending',
+    sub: user.sub,
+    client_email: '',
+    client_name: '',
     items: []
   }
 

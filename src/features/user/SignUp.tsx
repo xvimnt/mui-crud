@@ -69,6 +69,7 @@ export default function SignUp() {
           username: email,
           email_verified: false,
           jwt: null,
+          sub: "",
         }
         dispatch(loginUser(newUser))
       } catch (error) {

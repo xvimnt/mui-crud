@@ -11,4 +11,7 @@ export interface Order {
     items: OrderItem[],
     date: string;
     state: 'pending' | 'closed' | 'canceled',
+    sub: string; // Cognito ID
+    client_email: string
+    client_name: string
 }

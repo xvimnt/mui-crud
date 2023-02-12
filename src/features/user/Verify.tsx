@@ -96,6 +96,7 @@ export default function Verify() {
             <ButtonGroup sx={{ mt: 3, mb: 2 }}>
               <Button
                 fullWidth
+                size="small"
                 variant="contained"
                 onClick={resendConfirmationCode}
               >
@@ -103,6 +104,7 @@ export default function Verify() {
               </Button>
               <Button
                 fullWidth
+                size="small"
                 variant="contained"
                 color='success'
                 onClick={verify}

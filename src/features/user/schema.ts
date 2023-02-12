@@ -3,4 +3,5 @@ export interface User {
     username: string;
     email_verified: boolean;
     jwt: string,
+    sub: string, // Cognito ID
 }

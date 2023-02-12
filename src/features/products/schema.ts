@@ -7,4 +7,5 @@ export interface Product {
     imageUrl: string;
     price: number;
     stock: number;
+    sub: string; // Cognito ID
 }
