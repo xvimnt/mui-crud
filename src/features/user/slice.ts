@@ -5,7 +5,7 @@ import { RootState } from '../../app/store';
 // Define the initial state using that type
 const initialState: Interface = {
     email: "",
-    username: "",
+    nickname: "",
     email_verified: false,
     jwt: "",
     sub: "",
@@ -20,14 +20,14 @@ export const userSlice = createSlice({
         },
         loginUser: (state, action) => {
             state.email = action.payload.email
-            state.username = action.payload.username
+            state.nickname = action.payload.nickname
             state.email_verified = action.payload.email_verified
             state.jwt = action.payload.jwt
             state.sub = action.payload.sub
         },
         logoutUser: (state) => {
             state.email = initialState.email
-            state.username = initialState.username
+            state.nickname = initialState.nickname
             state.email_verified = initialState.email_verified
             state.jwt = initialState.jwt
             state.sub = initialState.sub

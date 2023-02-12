@@ -11,7 +11,7 @@ export default function AdminLayout(props: any) {
   const navigate = useNavigate()
   
   useEffect(() => {
-    // redirect authenticated user to profile screen
+    // redirect user to main screen if is not authenticated
     if (!user.email_verified) navigate('/')
   }, [navigate, user])
 

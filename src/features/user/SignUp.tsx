@@ -43,10 +43,9 @@ export default function SignUp() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log(user)
     // redirect authenticated user to profile screen
-    if (user.email_verified) navigate('/home')
-    else if (user.username) navigate("/verify")
+    if (user.email_verified) navigate('/dashboard')
+    else if (user.email) navigate("/verify")
   }, [navigate, user])
 
   async function signUp() {
@@ -66,7 +65,7 @@ export default function SignUp() {
         });
         const newUser = {
           email: email,
-          username: email,
+          nickname: nickname,
           email_verified: false,
           jwt: null,
           sub: "",

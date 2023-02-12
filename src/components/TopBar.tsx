@@ -8,7 +8,8 @@ import { Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import { AccountCircle } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '../features/user/slice';
+import { logoutUser, selectUser } from '../features/user/slice';
+import { useAppSelector } from '../app/hooks';
 
 const drawerWidth = 240;
 
@@ -35,6 +36,7 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 export default function TopBar(props: any) {
+    const user = useAppSelector(selectUser);
 
     const { open, handleDrawerOpen } = props
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -96,6 +98,9 @@ export default function TopBar(props: any) {
                             onClick={handleMenu}
                             color="inherit"
                         >
+                        <Typography sx={{marginRight: 1}}>
+                            {user.nickname}
+                        </Typography>
                             <AccountCircle />
                         </IconButton>
                         <Menu

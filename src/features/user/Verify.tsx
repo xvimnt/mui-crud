@@ -11,7 +11,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { Auth } from 'aws-amplify';
-import { selectUser, confirmUser } from './slice';
+import { selectUser, logoutUser } from './slice';
 import { useAppSelector } from '../../app/hooks';
 import { useDispatch } from 'react-redux';
 import { ButtonGroup } from '@mui/material';
@@ -41,7 +41,7 @@ export default function Verify() {
 
   useEffect(() => {
     // redirect authenticated user to profile screen
-    if (user.email_verified) navigate('/dashboard')
+    if (!user.email) navigate('/')
   }, [navigate, user])
 
   async function resendConfirmationCode() {
@@ -55,7 +55,7 @@ export default function Verify() {
   async function verify() {
     try {
       await Auth.confirmSignUp(user.email, code);
-      dispatch(confirmUser())
+      dispatch(logoutUser())
     } catch (error) {
       console.error(error)
     }

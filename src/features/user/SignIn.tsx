@@ -44,7 +44,7 @@ export default function SignIn() {
   useEffect(() => {
     // redirect authenticated user to profile screen
     if (user.email_verified) navigate('/dashboard')
-    else if (user.username) navigate("/verify")
+    else if (user.email) navigate("/verify")
   }, [navigate, user])
 
   const [email, setEmail] = useState('')
@@ -58,7 +58,7 @@ export default function SignIn() {
         const user = await Auth.signIn(email, password);
         const newUser = {
           email: user.attributes.email,
-          username: user.username,
+          nickname: user.attributes.nickname,
           email_verified: user.attributes.email_verified,
           jwt: user.signInUserSession.accessToken.jwtToken,
           sub: user.attributes.sub,
